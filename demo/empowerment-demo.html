@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellnessApp - Empowerment Notifications Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FAFBFC, #F0F2F5);
+            color: #1A1A1A;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #4A90A4, #E8B4B8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #6B6B6B;
+            margin-bottom: 20px;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .demo-btn {
+            background: #4A90A4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .demo-btn:hover {
+            background: #2E5266;
+            transform: translateY(-2px);
+        }
+        
+        .notification {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 4px solid #4A90A4;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4A90A4, #E8B4B8, #F4E4C1);
+        }
+        
+        .notification.affirmation {
+            border-left-color: #E8B4B8;
+            background: linear-gradient(135deg, #fff, #fef7f7);
+        }
+        
+        .notification.celebration {
+            border-left-color: #52A788;
+            background: linear-gradient(135deg, #fff, #f0f9f4);
+        }
+        
+        .notification.support {
+            border-left-color: #8B5A96;
+            background: linear-gradient(135deg, #fff, #f8f4f9);
+        }
+        
+        .notification.evening {
+            border-left-color: #6B8CAE;
+            background: linear-gradient(135deg, #fff, #f4f6f9);
+        }
+        
+        .notif-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .notif-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .notif-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        
+        .notif-time {
+            font-size: 12px;
+            color: #6B6B6B;
+            margin-left: auto;
+        }
+        
+        .notif-message {
+            font-size: 15px;
+            color: #2D3436;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .notif-action {
+            background: #4A90A4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .notif-action:hover {
+            background: #2E5266;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stats-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1A1A1A;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4A90A4;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6B6B6B;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float 3s ease-in-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes float {
+            0% {
+                opacity: 1;
+                transform: translateY(100vh) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(50vh) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+        }
+        
+        .weekly-report {
+            background: linear-gradient(135deg, #4A90A4, #7BB3C0);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .report-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .achievement {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="hearts"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="title">💖 Empowerment Notifications</div>
+            <div class="subtitle">Experience how we make women feel beloved and confident every day</div>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="showAffirmation()">Daily Love</button>
+                <button class="demo-btn" onclick="showCelebration()">Celebrate</button>
+                <button class="demo-btn" onclick="showSupport()">Support</button>
+                <button class="demo-btn" onclick="showEvening()">Evening Love</button>
+                <button class="demo-btn" onclick="showBodyPositivity()">Body Love</button>
+                <button class="demo-btn" onclick="showWeeklyReport()">Weekly Report</button>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stats-title">✨ Empowerment Impact</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="messagesCount">0</span>
+                    <div class="stat-label">Love Messages Sent</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="confidenceBoost">0%</span>
+                    <div class="stat-label">Confidence Boost</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="notifications"></div>
+    </div>
+
+    <script>
+        let messageCount = 0;
+        let confidenceLevel = 0;
+        
+        const affirmations = [
+            "🌟 You are absolutely radiant today, beautiful soul",
+            "💖 Your natural beauty shines from within - embrace it", 
+            "✨ You deserve all the love and care you give yourself",
+            "🌸 Your skin is telling a story of strength and resilience",
+            "💫 You are worthy of feeling confident and beautiful",
+            "🦋 Every step in your beauty journey is an act of self-love",
+            "🌺 Your unique beauty is a gift to the world",
+            "💕 You are enough, exactly as you are right now"
+        ];
+        
+        const celebrations = [
+            "🎉 You just loved yourself beautifully - well done!",
+            "✨ Your future self is thanking you right now", 
+            "💖 That's how self-love looks in action - gorgeous!",
+            "🌟 You're glowing from the inside out today",
+            "👑 7 days of self-love! You're building something beautiful",
+            "💎 Two weeks strong! Your dedication is inspiring"
+        ];
+        
+        const supportMessages = [
+            "💙 Bad skin days don't define your beauty - you're still gorgeous",
+            "🤗 Every skin journey has ups and downs - you're not alone",
+            "🌱 Healing takes time, and you're being so patient with yourself",
+            "💕 Your worth isn't measured by your skin - you're amazing inside and out",
+            "🌸 Tomorrow is a fresh start - no guilt, just grace",
+            "💖 Self-compassion is the best skincare ingredient"
+        ];
+        
+        const eveningMessages = [
+            "🌙 Before you sleep, remember: you did your best today, and that's enough",
+            "✨ You are loved, you are worthy, you are enough - sweet dreams, beautiful",
+            "💕 Tomorrow is another chance to love yourself - rest well, gorgeous",
+            "🌟 Your beauty shines even in your sleep - you're absolutely wonderful",
+            "💖 End this day with gratitude for your amazing self - you deserve peace"
+        ];
+        
+        const bodyPositivityMessages = [
+            "🌸 Your body is your home - treat it with love and respect",
+            "💖 Every curve, every line tells the story of your beautiful life",
+            "✨ Your body has carried you through everything - it deserves appreciation",
+            "🦋 You are not too much or too little - you are exactly right",
+            "🌺 Your body is not an ornament - it's the vehicle for your dreams"
+        ];
+        
+        function createNotification(type, title, message, icon, action = null) {
+            const container = document.getElementById('notifications');
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            
+            notif.innerHTML = `
+                <div class="notif-header">
+                    <div class="notif-icon">${icon}</div>
+                    <div class="notif-title">${title}</div>
+                    <div class="notif-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+                <div class="notif-message">${message}</div>
+                ${action ? `<button class="notif-action" onclick="${action.onclick}">${action.text}</button>` : ''}
+            `;
+            
+            container.insertBefore(notif, container.firstChild);
+            
+            // Update stats
+            messageCount++;
+            confidenceLevel = Math.min(100, confidenceLevel + 5);
+            document.getElementById('messagesCount').textContent = messageCount;
+            document.getElementById('confidenceBoost').textContent = confidenceLevel;
+            
+            // Add floating hearts
+            createFloatingHearts();
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (notif.parentNode) {
+                    notif.style.opacity = '0';
+                    notif.style.transform = 'translateX(100%)';
+                    setTimeout(() => notif.remove(), 300);
+                }
+            }, 10000);
+        }
+        
+        function showAffirmation() {
+            const message = affirmations[Math.floor(Math.random() * affirmations.length)];
+            const greetings = ['Good morning, Beautiful!', 'Hello gorgeous!', 'Hey beautiful soul!'];
+            const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+            
+            createNotification('affirmation', greeting, message, '💖', {
+                text: 'I receive this love',
+                onclick: 'acceptLove()'
+            });
+        }
+        
+        function showCelebration() {
+            const message = celebrations[Math.floor(Math.random() * celebrations.length)];
+            createNotification('celebration', '🎉 Celebration Time!', message, '🏆', {
+                text: 'Share my joy',
+                onclick: 'shareJoy()'
+            });
+        }
+        
+        function showSupport() {
+            const message = supportMessages[Math.floor(Math.random() * supportMessages.length)];
+            createNotification('support', '💕 You\'re Not Alone', message, '🤗', {
+                text: 'Send love to others',
+                onclick: 'sendLove()'
+            });
+        }
+        
+        function showEvening() {
+            const message = eveningMessages[Math.floor(Math.random() * eveningMessages.length)];
+            createNotification('evening', '🌙 Evening Love', message, '✨', {
+                text: 'Goodnight affirmation',
+                onclick: 'goodnightLove()'
+            });
+        }
+        
+        function showBodyPositivity() {
+            const message = bodyPositivityMessages[Math.floor(Math.random() * bodyPositivityMessages.length)];
+            createNotification('affirmation', '💖 Body Love Reminder', message, '🌸', {
+                text: 'Practice self-love',
+                onclick: 'practiceSelfLove()'
+            });
+        }
+        
+        function showWeeklyReport() {
+            const container = document.getElementById('notifications');
+            const report = document.createElement('div');
+            report.className = 'weekly-report';
+            
+            report.innerHTML = `
+                <div class="report-title">Your Weekly Glow Report ✨</div>
+                <div class="achievement">🏆 You prioritized self-care 6 times this week!</div>
+                <div class="achievement">🔥 You maintained your beautiful routine streak!</div>
+                <div class="achievement">💕 You spread love in the community!</div>
+                <div style="margin-top: 15px; font-size: 16px; font-style: italic;">
+                    "You are growing more beautiful and confident every single day"
+                </div>
+            `;
+            
+            container.insertBefore(report, container.firstChild);
+            
+            setTimeout(() => {
+                if (report.parentNode) {
+                    report.style.opacity = '0';
+                    setTimeout(() => report.remove(), 300);
+                }
+            }, 15000);
+        }
+        
+        function createFloatingHearts() {
+            const hearts = ['💖', '💕', '💗', '💝', '🌸', '✨', '🦋', '🌟'];
+            const container = document.getElementById('hearts');
+            
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    container.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 3000);
+                }, i * 200);
+            }
+        }
+        
+        function acceptLove() {
+            alert('💖 You are worthy of all the love in the world, beautiful!');
+        }
+        
+        function shareJoy() {
+            alert('🎉 Your joy is contagious - keep shining and inspiring others!');
+        }
+        
+        function sendLove() {
+            alert('💕 Your compassion makes the world more beautiful. Thank you for caring!');
+        }
+        
+        function goodnightLove() {
+            alert('🌙 Sweet dreams, gorgeous. Tomorrow is another day to love yourself!');
+        }
+        
+        function practiceSelfLove() {
+            alert('🌸 Take a moment to appreciate your amazing body - it does so much for you!');
+        }
+        
+        // Auto-demo
+        setTimeout(() => {
+            showAffirmation();
+            setTimeout(() => showCelebration(), 3000);
+            setTimeout(() => showSupport(), 6000);
+        }, 2000);
+    </script>
+</body>
+</html>

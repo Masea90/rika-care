@@ -1,0 +1,33 @@
+{
+  "name": "RIKA - Real beauty. Real guidance.",
+  "short_name": "RIKA",
+  "description": "AI-powered skincare platform with privacy-first approach and ingredient analysis",
+  "start_url": "/rika-premium.html",
+  "display": "standalone",
+  "background_color": "#FEFCFA",
+  "theme_color": "#E8DDD4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "rika-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "rika-icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["beauty", "lifestyle", "health", "wellness"],
+  "lang": "en",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "screenshot-home.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "label": "RIKA Home Dashboard"
+    }
+  ]
+}

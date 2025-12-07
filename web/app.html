@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIKA Care - Real App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A90A4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="RIKA">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAFBFC;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .phone-frame {
+            max-width: 375px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: 667px;
+            position: relative;
+        }
+        
+        .screen { display: none; padding: 20px; min-height: 627px; padding-bottom: 80px; }
+        .screen.active { display: block; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: white;
+            border-bottom: 1px solid #E1E5E9;
+        }
+        
+        .title { font-size: 24px; font-weight: bold; color: #1A1A1A; margin-bottom: 5px; }
+        .subtitle { font-size: 14px; color: #4A4A4A; }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #4A90A4, #7BB3C0);
+            color: white;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-title { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .welcome-text { font-size: 16px; opacity: 0.9; margin-bottom: 20px; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E1E5E9;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #4A90A4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover { background: #3A7A94; }
+        .btn-secondary { background: #6B6B6B; }
+        
+        .nav-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            max-width: 100%;
+            background: white;
+            border-top: 1px solid #E1E5E9;
+            display: flex;
+            z-index: 100;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 11px;
+            color: #6B6B6B;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .nav-tab.active { color: #4A90A4; }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .stat-number { font-size: 24px; font-weight: bold; color: #4A90A4; }
+        .stat-label { font-size: 12px; color: #6B6B6B; }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #4A90A4, #7BB3C0);
+            color: white;
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+        
+        .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .profile-subtitle { font-size: 14px; opacity: 0.9; }
+        
+        .error { background: #FFE6E6; color: #D63031; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+        .success { background: #E6F7E6; color: #00B894; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Login Screen -->
+        <div class="screen active" id="loginScreen">
+            <div class="welcome-card">
+                <div class="welcome-title">🌿 RIKA Care</div>
+                <div class="welcome-text">Your natural beauty journey with real data</div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <select id="loginLanguageSelect" onchange="changeLoginLanguage()" style="width: 100%; padding: 8px; border: 1px solid #E1E5E9; border-radius: 6px; font-size: 14px;">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="fr">🇫🇷 Français</option>
+                </select>
+            </div>
+            
+            <div id="loginError" class="error hidden"></div>
+            <div id="loginSuccess" class="success hidden"></div>
+            
+            <div class="card">
+                <div class="card-title" id="authTitle">Login to RIKA</div>
+                <form id="authForm">
+                    <input type="email" id="email" class="input" placeholder="Email" required>
+                    <input type="password" id="password" class="input" placeholder="Password" required>
+                    <button type="submit" class="btn" id="authBtn">Login</button>
+                </form>
+                <button class="btn btn-secondary" onclick="toggleAuthMode()" id="toggleBtn">Don't have an account? Sign up</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div class="screen" id="dashboard">
+            <div class="header">
+                <div class="title">Good morning! ☀️</div>
+                <div class="subtitle" id="dashboardName">Beautiful</div>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="followersCount">0</div>
+                    <div class="stat-label">followers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="followingCount">0</div>
+                    <div class="stat-label">following</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="verifiedStatus">❌</div>
+                    <div class="stat-label">verified</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">💡 Welcome to RIKA</div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 12px;">Your account is connected to the real database. Start exploring!</div>
+                <button class="btn" onclick="verifyAccount()">Verify Your Account</button>
+            </div>
+        </div>
+
+        <!-- Discover Screen -->
+        <div class="screen" id="discover">
+            <div class="header">
+                <div class="title">✨ Discover Products</div>
+            </div>
+            
+            <div style="background: #F4E4C1; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">💡 Your Beauty Insights</div>
+                <div style="font-size: 14px; color: #6B6B6B;">Complete your profile for personalized product recommendations!</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🔥 Trending Products</div>
+                
+                <div style="border: 1px solid #E1E5E9; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                    <div style="text-align: center; font-size: 32px; margin-bottom: 10px;">🧴</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Gentle Oat Cleanser</div>
+                    <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Pure Nature</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #4A90A4;">$24.99</div>
+                </div>
+                
+                <button class="btn" onclick="getRecommendations()">Get My Recommendations</button>
+            </div>
+        </div>
+
+        <!-- Routine Screen -->
+        <div class="screen" id="routine">
+            <div class="header">
+                <div class="title">Today's Progress</div>
+            </div>
+            
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #4A90A4; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; margin: 0 auto 20px;">
+                <div style="font-size: 20px; font-weight: bold;">0%</div>
+                <div style="font-size: 10px;">Complete</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🌅 Morning Routine</div>
+                
+                <div style="background: #F8F9FA; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; border: 2px solid #E1E5E9; border-radius: 50%; margin-right: 15px;"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Gentle Cleanser</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                </div>
+                
+                <div style="background: #F8F9FA; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; border: 2px solid #E1E5E9; border-radius: 50%; margin-right: 15px;"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Moisturizer</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="alert('Complete your profile to unlock personalized routines!')">Start Routine</button>
+            </div>
+        </div>
+
+        <!-- Community Screen -->
+        <div class="screen" id="community">
+            <div class="header">
+                <div class="title">👥 Community</div>
+            </div>
+            
+            <div style="background: #F8F9FA; border: 1px solid #E1E5E9; border-radius: 12px; padding: 16px; margin-bottom: 16px; display: flex; align-items: center;">
+                <div style="width: 40px; height: 40px; background: #4A90A4; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;" id="communityAvatar">You</div>
+                <div style="flex: 1; font-size: 16px; color: #6B6B6B;">Share your beauty journey...</div>
+                <div style="display: flex; gap: 8px;">
+                    <span style="font-size: 20px;">📝</span>
+                    <span style="font-size: 20px;">📷</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <div style="width: 40px; height: 40px; background: #52A788; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">S</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Sarah M.</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2h ago</div>
+                    </div>
+                </div>
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">My Morning Glow Routine ✨</div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 12px;">Finally found the perfect combination for my skin!</div>
+                <div style="display: flex; justify-content: space-between;">
+                    <button style="background: none; border: none; color: #6B6B6B; cursor: pointer;">❤️ 47</button>
+                    <button style="background: none; border: none; color: #6B6B6B; cursor: pointer;">💬 12</button>
+                    <button style="background: none; border: none; color: #6B6B6B; cursor: pointer;">📤 8</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="getCommunityFeed()">Load More Posts</button>
+        </div>
+
+        <!-- Profile Screen -->
+        <div class="screen" id="profile">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-name" id="profileName">User</div>
+                <div class="profile-subtitle" id="profileEmail">user@email.com</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Account Status</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Email Verified</span>
+                    <span id="emailVerified">❌</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Followers</span>
+                    <span id="profileFollowers">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Following</span>
+                    <span id="profileFollowing">0</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <button class="btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">
+                <div class="nav-icon">🏠</div>
+                <div>Home</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('discover')">
+                <div class="nav-icon">✨</div>
+                <div>Discover</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('routine')">
+                <div class="nav-icon">📝</div>
+                <div>Routine</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('community')">
+                <div class="nav-icon">👥</div>
+                <div>Community</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('profile')">
+                <div class="nav-icon">👤</div>
+                <div>Profile</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let authToken = localStorage.getItem('rikaToken');
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
+        }
+        
+        // Check if user is already logged in
+        if (authToken) {
+            loadUserData();
+        }
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+                const body = isLoginMode ? 
+                    { email, password } : 
+                    { email, password, profile: { personalInfo: { name: email.split('@')[0] } } };
+                
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('rikaToken', authToken);
+                    showLoginSuccess(isLoginMode ? 'Login successful!' : 'Account created!');
+                    setTimeout(() => loadUserData(), 1000);
+                } else {
+                    showLoginError(data.error || 'Authentication failed');
+                }
+            } catch (error) {
+                showLoginError('Connection error. Make sure backend is running.');
+            }
+        });
+
+        async function loadUserData() {
+            try {
+                const response = await fetch(API_BASE + '/user/profile', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    currentUser = await response.json();
+                    showDashboard();
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                showLoginError('Failed to load user data');
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            
+            updateUserDisplay();
+        }
+        
+        async function getRecommendations() {
+            try {
+                const response = await fetch(API_BASE + '/recommendations', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('🌿 Your personalized recommendations are ready! Complete your profile for better matches.');
+                } else {
+                    alert('Complete your skin analysis first to get personalized recommendations!');
+                }
+            } catch (error) {
+                alert('Recommendations coming soon! Complete your profile setup.');
+            }
+        }
+        
+        async function getCommunityFeed() {
+            try {
+                const response = await fetch(API_BASE + '/community/feed', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const posts = await response.json();
+                    alert(`👥 Community has ${posts.length} posts! Join the conversation by sharing your beauty journey.`);
+                } else {
+                    alert('Welcome to the RIKA community! Start by sharing your first post.');
+                }
+            } catch (error) {
+                alert('Community is growing! Be one of the first to share your beauty story.');
+            }
+        }
+
+        function updateUserDisplay() {
+            if (!currentUser) return;
+            
+            const name = currentUser.profile?.personalInfo?.name || currentUser.email.split('@')[0];
+            
+            // Update dashboard
+            document.getElementById('dashboardName').textContent = name;
+            document.getElementById('followersCount').textContent = (currentUser.followers || []).length;
+            document.getElementById('followingCount').textContent = (currentUser.following || []).length;
+            document.getElementById('verifiedStatus').textContent = 
+                currentUser.verification?.status === 'verified' ? '✅' : '❌';
+            
+            // Update profile
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileAvatar').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('emailVerified').textContent = 
+                currentUser.verification?.status === 'verified' ? '✅' : '❌';
+            document.getElementById('profileFollowers').textContent = (currentUser.followers || []).length;
+            document.getElementById('profileFollowing').textContent = (currentUser.following || []).length;
+            
+            // Update community avatar
+            document.getElementById('communityAvatar').textContent = name.charAt(0).toUpperCase();
+        }
+
+        async function verifyAccount() {
+            try {
+                const response = await fetch(API_BASE + '/user/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        method: 'email',
+                        data: { email: currentUser.email }
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('✅ Account verified successfully!');
+                    loadUserData(); // Refresh user data
+                } else {
+                    alert('Verification failed');
+                }
+            } catch (error) {
+                alert('Verification error');
+            }
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.nav-tab').classList.add('active');
+            
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const authBtn = document.getElementById('authBtn');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const authTitle = document.getElementById('authTitle');
+            
+            if (isLoginMode) {
+                authBtn.textContent = 'Login';
+                toggleBtn.textContent = "Don't have an account? Sign up";
+                authTitle.textContent = 'Login to RIKA';
+            } else {
+                authBtn.textContent = 'Sign Up';
+                toggleBtn.textContent = 'Already have an account? Login';
+                authTitle.textContent = 'Join RIKA';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('rikaToken');
+            authToken = null;
+            currentUser = null;
+            document.getElementById('loginScreen').classList.add('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('profile').classList.remove('active');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showLoginError(message) {
+            const errorEl = document.getElementById('loginError');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 5000);
+        }
+
+        function showLoginSuccess(message) {
+            const successEl = document.getElementById('loginSuccess');
+            successEl.textContent = message;
+            successEl.classList.remove('hidden');
+            setTimeout(() => successEl.classList.add('hidden'), 3000);
+        }
+        
+        function changeLoginLanguage() {
+            const selectedLanguage = document.getElementById('loginLanguageSelect').value;
+            localStorage.setItem('rika-language', selectedLanguage);
+        }
+    </script>
+</body>
+</html>

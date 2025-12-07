@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellnessApp - Complete Experience</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAFBFC;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .phone-frame {
+            max-width: 375px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: 667px;
+            position: relative;
+        }
+        
+        .screen { display: none; padding: 20px; min-height: 627px; padding-bottom: 80px; }
+        .screen.active { display: block; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: white;
+            border-bottom: 1px solid #E1E5E9;
+        }
+        
+        .title { font-size: 24px; font-weight: bold; color: #1A1A1A; margin-bottom: 5px; }
+        .subtitle { font-size: 14px; color: #4A4A4A; }
+        .progress { font-size: 12px; color: #6B6B6B; margin-top: 10px; }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #4A90A4, #7BB3C0);
+            color: white;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-title { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .welcome-text { font-size: 16px; opacity: 0.9; margin-bottom: 20px; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E1E5E9;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .option-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .option {
+            background: #F8F9FA;
+            border: 1px solid #E1E5E9;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 45%;
+            text-align: center;
+        }
+        
+        .option:hover, .option.selected {
+            background: #4A90A4;
+            color: white;
+            border-color: #4A90A4;
+        }
+        
+        .btn {
+            background: #4A90A4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:disabled { background: #E1E5E9; color: #6B6B6B; cursor: not-allowed; }
+        
+        .nav-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            max-width: 100%;
+            background: white;
+            border-top: 1px solid #E1E5E9;
+            display: flex;
+            z-index: 100;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 11px;
+            color: #6B6B6B;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .nav-tab.active { color: #4A90A4; }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .stat-number { font-size: 24px; font-weight: bold; color: #4A90A4; }
+        .stat-label { font-size: 12px; color: #6B6B6B; }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #E1E5E9;
+            position: relative;
+        }
+        
+        .product-match {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #52A788;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .routine-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #E1E5E9;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .routine-item.completed { background: #F4E4C1; }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E1E5E9;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox.checked { background: #52A788; border-color: #52A788; color: white; }
+        
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #4A90A4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #F0F2F5;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: #6B6B6B;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .demo-note {
+            background: #E8B4B8;
+            color: #1A1A1A;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .analysis-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .method-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #E1E5E9;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .method-card:hover {
+            border-color: #4A90A4;
+            box-shadow: 0 4px 12px rgba(74, 144, 164, 0.1);
+        }
+        
+        .method-icon { font-size: 40px; margin-bottom: 12px; }
+        .method-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .method-desc { font-size: 14px; color: #6B6B6B; margin-bottom: 8px; }
+        .method-time { font-size: 12px; color: #4A90A4; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome">
+            <div class="welcome-card">
+                <div class="welcome-title">🌿 WellnessApp</div>
+                <div class="welcome-text">Discover your natural beauty journey with AI-powered recommendations and a supportive community</div>
+                <button class="btn" style="background: white; color: #4A90A4; margin-top: 0;" onclick="showScreen('profile1')">Get Started</button>
+            </div>
+            
+            <div class="demo-note">
+                ✨ Complete Interactive Demo - Experience the full app journey!
+            </div>
+            
+            <div class="card">
+                <div class="card-title">What You'll Discover:</div>
+                <div style="font-size: 14px; color: #6B6B6B; line-height: 1.6;">
+                    • Your unique skin and hair characteristics<br>
+                    • Personalized natural product recommendations<br>
+                    • Daily routine tracking with rewards<br>
+                    • Community of like-minded beauty enthusiasts
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Step 1: Personal Info -->
+        <div class="screen" id="profile1">
+            <div class="header">
+                <div class="title">Tell us about yourself</div>
+                <div class="progress">Step 1 of 6</div>
+            </div>
+            
+            <div class="card">
+                <input type="text" class="input" placeholder="Your name" id="userName">
+                <input type="number" class="input" placeholder="Age" id="userAge">
+                
+                <div class="card-title">Gender</div>
+                <div class="option-grid">
+                    <div class="option" onclick="selectGender(this, 'female')">Female</div>
+                    <div class="option" onclick="selectGender(this, 'male')">Male</div>
+                    <div class="option" onclick="selectGender(this, 'other')">Other</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showScreen('profile2')">Next</button>
+        </div>
+
+        <!-- Profile Step 2: Skin Analysis Method -->
+        <div class="screen" id="profile2">
+            <div class="header">
+                <div class="title">Discover Your Skin Type</div>
+                <div class="progress">Step 2 of 6</div>
+            </div>
+            
+            <div class="analysis-methods">
+                <div class="method-card" onclick="showScreen('skinQuiz')">
+                    <div class="method-icon">🔍</div>
+                    <div class="method-title">Skin Type Quiz</div>
+                    <div class="method-desc">Answer 5 questions about your skin behavior</div>
+                    <div class="method-time">⏱️ 2 minutes</div>
+                </div>
+                
+                <div class="method-card" onclick="showScreen('selfieAnalysis')">
+                    <div class="method-icon">📸</div>
+                    <div class="method-title">AI Selfie Analysis</div>
+                    <div class="method-desc">Let AI analyze your skin from a photo</div>
+                    <div class="method-time">⏱️ 30 seconds</div>
+                </div>
+            </div>
+            
+            <div style="background: #F4E4C1; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">⚕️ Safety First</div>
+                <div style="font-size: 12px; color: #6B6B6B;">This analysis is for cosmetic guidance only. For medical concerns, consult a dermatologist.</div>
+            </div>
+        </div>
+
+        <!-- Skin Quiz -->
+        <div class="screen" id="skinQuiz">
+            <div class="header">
+                <div class="title">Skin Analysis Quiz</div>
+                <div class="progress">Question 1 of 3</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">How does your skin feel in the morning?</div>
+                <div class="option" onclick="selectSkinAnswer(this, 'dry')">Tight and dry</div>
+                <div class="option" onclick="selectSkinAnswer(this, 'normal')">Comfortable and balanced</div>
+                <div class="option" onclick="selectSkinAnswer(this, 'oily')">Oily and shiny</div>
+                <div class="option" onclick="selectSkinAnswer(this, 'combination')">Oily T-zone, dry cheeks</div>
+            </div>
+            
+            <button class="btn" id="skinQuizNext" onclick="showScreen('skinResult')" disabled>Next Question</button>
+        </div>
+
+        <!-- Selfie Analysis -->
+        <div class="screen" id="selfieAnalysis">
+            <div class="header">
+                <div class="title">AI Skin Analysis</div>
+            </div>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <div style="width: 200px; height: 200px; border: 3px dashed #4A90A4; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 60px; opacity: 0.3;">👤</div>
+                <div style="font-size: 16px; margin-bottom: 20px;">Position your face in the circle</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📋 For Best Results:</div>
+                <div style="font-size: 14px; color: #6B6B6B;">
+                    ✓ Clean, makeup-free face<br>
+                    ✓ Good natural lighting<br>
+                    ✓ Face camera directly<br>
+                    ✓ Neutral expression
+                </div>
+            </div>
+            
+            <button class="btn" onclick="simulateAIAnalysis()">📸 Take Selfie</button>
+        </div>
+
+        <!-- Skin Analysis Result -->
+        <div class="screen" id="skinResult">
+            <div class="header">
+                <div class="title">✨ Analysis Complete!</div>
+            </div>
+            
+            <div style="background: #4A90A4; color: white; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;" id="skinTypeResult">COMBINATION SKIN</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 15px;">Your T-zone is oily while cheeks are normal to dry. You need targeted care for different areas.</div>
+                <div style="background: #52A788; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block;">95% confident</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">💡 Personalized Care Tips:</div>
+                <div style="font-size: 14px; color: #6B6B6B; line-height: 1.6;">
+                    • Use different products for T-zone and cheeks<br>
+                    • Gentle cleansing is essential<br>
+                    • Choose lightweight moisturizers<br>
+                    • Don't skip moisturizer on oily areas
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showScreen('profile3')">Continue Profile</button>
+        </div>
+
+        <!-- Profile Step 3: Hair Analysis -->
+        <div class="screen" id="profile3">
+            <div class="header">
+                <div class="title">Tell us about your hair</div>
+                <div class="progress">Step 3 of 6</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Hair type</div>
+                <div class="option-grid">
+                    <div class="option" onclick="selectHair(this, 'straight')">Straight</div>
+                    <div class="option" onclick="selectHair(this, 'wavy')">Wavy</div>
+                    <div class="option" onclick="selectHair(this, 'curly')">Curly</div>
+                    <div class="option" onclick="selectHair(this, 'coily')">Coily</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Hair texture</div>
+                <div class="option-grid">
+                    <div class="option" onclick="selectTexture(this, 'fine')">Fine</div>
+                    <div class="option" onclick="selectTexture(this, 'medium')">Medium</div>
+                    <div class="option" onclick="selectTexture(this, 'thick')">Thick</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showScreen('profile4')">Next</button>
+        </div>
+
+        <!-- Profile Step 4: Budget & Preferences -->
+        <div class="screen" id="profile4">
+            <div class="header">
+                <div class="title">Budget & Preferences</div>
+                <div class="progress">Step 4 of 6</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Monthly budget for beauty products</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="number" class="input" placeholder="Min" style="flex: 1; margin-bottom: 0;">
+                    <span>to</span>
+                    <input type="number" class="input" placeholder="Max" style="flex: 1; margin-bottom: 0;">
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Important certifications</div>
+                <div class="option-grid">
+                    <div class="option" onclick="toggleCert(this)">Organic</div>
+                    <div class="option" onclick="toggleCert(this)">Cruelty-free</div>
+                    <div class="option" onclick="toggleCert(this)">Vegan</div>
+                    <div class="option" onclick="toggleCert(this)">Natural</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showScreen('profile5')">Next</button>
+        </div>
+
+        <!-- Profile Step 5: Community Settings -->
+        <div class="screen" id="profile5">
+            <div class="header">
+                <div class="title">Join Our Community</div>
+                <div class="progress">Step 5 of 6</div>
+            </div>
+            
+            <div style="background: #6B8CAE; color: white; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">🌟 Find Your Beauty Tribe</div>
+                <div style="font-size: 14px; opacity: 0.9;">Match with users who have similar skin type, hair type, and beauty goals</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Community preferences</div>
+                <div class="option" onclick="toggleCommunity(this)" style="margin-bottom: 10px;">Make my profile public</div>
+                <div class="option" onclick="toggleCommunity(this)" style="margin-bottom: 10px;">Allow community matching</div>
+                <div class="option" onclick="toggleCommunity(this)" style="margin-bottom: 10px;">Share my beauty routines</div>
+            </div>
+            
+            <button class="btn" onclick="showScreen('profile6')">Next</button>
+        </div>
+
+        <!-- Profile Step 6: Premium Offer -->
+        <div class="screen" id="profile6">
+            <div class="header">
+                <div class="title">Choose Your Plan</div>
+                <div class="progress">Step 6 of 6</div>
+            </div>
+            
+            <div class="card" style="border: 2px solid #4A90A4;">
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">✨ Free Plan</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #4A90A4; margin-bottom: 15px;">$0/month</div>
+                    <div style="font-size: 14px; color: #6B6B6B; text-align: left;">
+                        • Basic skin & hair analysis<br>
+                        • Community access<br>
+                        • Limited routine sharing<br>
+                        • Basic product recommendations
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="border: 2px solid #8B5A96;">
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">🚀 Premium Plan</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #8B5A96; margin-bottom: 15px;">$9.99/month</div>
+                    <div style="font-size: 14px; color: #6B6B6B; text-align: left;">
+                        • Advanced AI recommendations<br>
+                        • Unlimited routine sharing<br>
+                        • Expert consultations<br>
+                        • Product discounts<br>
+                        • Priority community features
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="completeProfile()">Start with Free Plan</button>
+            <button class="btn" style="background: #8B5A96; margin-top: 10px;" onclick="completeProfile()">Try Premium Free (7 days)</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="screen" id="dashboard">
+            <div class="header">
+                <div class="title">Good morning! ☀️</div>
+                <div class="subtitle" id="dashboardName">Beautiful</div>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">day streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">65%</div>
+                    <div class="stat-label">today's progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">products saved</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">💡 Today's Tip</div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 12px;">Your combination skin loves gentle cleansing in the morning and deeper care at night!</div>
+                <button style="background: #4A90A4; color: white; border: none; padding: 6px 12px; border-radius: 16px; font-size: 12px;">Learn more</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Just for You</div>
+                <div class="product-card" style="margin: 0;">
+                    <div class="product-match">95%</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Morning Glow Routine</div>
+                    <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Perfect for your combination skin</div>
+                    <button style="background: #4A90A4; color: white; border: none; padding: 8px 12px; border-radius: 16px; font-size: 12px;">Try it now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Screen -->
+        <div class="screen" id="products">
+            <div class="header">
+                <div class="title">✨ Discover Products</div>
+            </div>
+            
+            <div style="background: #F4E4C1; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">💡 Your Beauty Insights</div>
+                <div style="font-size: 14px; color: #6B6B6B;">Based on your combination skin and curly hair, we found 12 trending products perfect for you!</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🔥 Perfect Matches</div>
+                
+                <div class="product-card" style="margin: 0 0 15px 0;">
+                    <div class="product-match">95%</div>
+                    <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">🧴</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Gentle Oat Cleanser</div>
+                    <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Pure Nature</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #4A90A4; margin-bottom: 8px;">$24.99</div>
+                    <div style="font-size: 12px; color: #52A788; font-style: italic;">Perfect for combination skin</div>
+                </div>
+                
+                <div class="product-card" style="margin: 0;">
+                    <div class="product-match">88%</div>
+                    <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">💇♀️</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Curl Defining Cream</div>
+                    <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Curly Crown</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #4A90A4; margin-bottom: 8px;">$32.00</div>
+                    <div style="font-size: 12px; color: #52A788; font-style: italic;">Designed for curly hair</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routine Screen -->
+        <div class="screen" id="routine">
+            <div class="header">
+                <div class="title">Today's Progress</div>
+            </div>
+            
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: #4A90A4; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; margin: 0 auto 20px;">
+                <div style="font-size: 20px; font-weight: bold;" id="routineProgress">65%</div>
+                <div style="font-size: 10px;">Complete</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🌅 Morning Routine</div>
+                
+                <div class="routine-item completed" onclick="toggleRoutine(this)">
+                    <div class="checkbox checked">✓</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Gentle Cleanser</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+10</div>
+                </div>
+                
+                <div class="routine-item completed" onclick="toggleRoutine(this)">
+                    <div class="checkbox checked">✓</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Vitamin C Serum</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">1 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+15</div>
+                </div>
+                
+                <div class="routine-item" onclick="toggleRoutine(this)">
+                    <div class="checkbox"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Moisturizer</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+10</div>
+                </div>
+                
+                <div class="routine-item" onclick="toggleRoutine(this)">
+                    <div class="checkbox"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Sunscreen SPF 30+</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Screen -->
+        <div class="screen" id="community">
+            <div class="header">
+                <div class="title">👥 Community</div>
+            </div>
+            
+            <div style="background: #F8F9FA; border: 1px solid #E1E5E9; border-radius: 12px; padding: 16px; margin-bottom: 16px; display: flex; align-items: center;">
+                <div style="width: 40px; height: 40px; background: #4A90A4; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">You</div>
+                <div style="flex: 1; font-size: 16px; color: #6B6B6B;">Share your beauty journey...</div>
+                <div style="display: flex; gap: 8px;">
+                    <span style="font-size: 20px;">📝</span>
+                    <span style="font-size: 20px;">📷</span>
+                    <span style="font-size: 20px;">⭐</span>
+                </div>
+            </div>
+            
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="avatar">S</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Sarah M.</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2h ago</div>
+                    </div>
+                    <div style="font-size: 16px;">✨</div>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">My Morning Glow Routine ✨</div>
+                <div style="font-size: 15px; color: #6B6B6B; margin-bottom: 12px;">Finally found the perfect combination for my combination skin! This routine has been a game-changer...</div>
+                <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                    <span style="background: #F4E4C1; padding: 4px 8px; border-radius: 12px; font-size: 12px; color: #4A90A4;">#morning</span>
+                    <span style="background: #F4E4C1; padding: 4px 8px; border-radius: 12px; font-size: 12px; color: #4A90A4;">#combination-skin</span>
+                </div>
+                <div class="post-actions">
+                    <button class="action-btn">❤️ 47</button>
+                    <button class="action-btn">💬 12</button>
+                    <button class="action-btn">📤 8</button>
+                    <button class="action-btn">🔖</button>
+                </div>
+            </div>
+            
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="avatar">E</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Emma K. <span style="background: #8B5A96; color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px;">PRO</span></div>
+                        <div style="font-size: 12px; color: #6B6B6B;">4h ago</div>
+                    </div>
+                    <div style="font-size: 16px;">⭐</div>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Honest Review: Organic Rose Cleanser</div>
+                <div style="font-size: 15px; color: #6B6B6B; margin-bottom: 12px;">After 30 days of testing this cleanser, here are my thoughts... Perfect for sensitive skin!</div>
+                <div class="post-actions">
+                    <button class="action-btn">❤️ 23</button>
+                    <button class="action-btn">💬 8</button>
+                    <button class="action-btn">📤 5</button>
+                    <button class="action-btn">🔖</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">
+                <div class="nav-icon">🏠</div>
+                <div>Home</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('products')">
+                <div class="nav-icon">✨</div>
+                <div>Discover</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('routine')">
+                <div class="nav-icon">📝</div>
+                <div>Routine</div>
+            </button>
+            <button class="nav-tab" onclick="showTab('community')">
+                <div class="nav-icon">👥</div>
+                <div>Community</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let userData = {};
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        function showTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.nav-tab').classList.add('active');
+            showScreen(tabId);
+        }
+        
+        function selectGender(element, value) {
+            document.querySelectorAll('#profile1 .option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            userData.gender = value;
+        }
+        
+        function selectSkinAnswer(element, value) {
+            document.querySelectorAll('#skinQuiz .option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            userData.skinType = value;
+            document.getElementById('skinQuizNext').disabled = false;
+        }
+        
+        function selectHair(element, value) {
+            document.querySelectorAll('#profile3 .option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            userData.hairType = value;
+        }
+        
+        function selectTexture(element, value) {
+            element.classList.toggle('selected');
+            userData.hairTexture = value;
+        }
+        
+        function toggleCert(element) {
+            element.classList.toggle('selected');
+        }
+        
+        function toggleCommunity(element) {
+            element.classList.toggle('selected');
+        }
+        
+        function simulateAIAnalysis() {
+            showScreen('skinResult');
+        }
+        
+        function completeProfile() {
+            const name = document.getElementById('userName').value || 'Beautiful';
+            document.getElementById('dashboardName').textContent = name;
+            showScreen('dashboard');
+        }
+        
+        function toggleRoutine(element) {
+            const checkbox = element.querySelector('.checkbox');
+            const isCompleted = element.classList.contains('completed');
+            
+            if (isCompleted) {
+                element.classList.remove('completed');
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+            } else {
+                element.classList.add('completed');
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+            }
+            
+            updateRoutineProgress();
+        }
+        
+        function updateRoutineProgress() {
+            const total = document.querySelectorAll('.routine-item').length;
+            const completed = document.querySelectorAll('.routine-item.completed').length;
+            const percentage = Math.round((completed / total) * 100);
+            document.getElementById('routineProgress').textContent = percentage + '%';
+        }
+    </script>
+</body>
+</html>

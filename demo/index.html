@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellnessApp - Interactive Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAFBFC;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .phone-frame {
+            max-width: 375px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: 667px;
+        }
+        
+        .screen { display: none; padding: 20px; min-height: 627px; }
+        .screen.active { display: block; }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: white;
+            border-bottom: 1px solid #E1E5E9;
+        }
+        
+        .title { font-size: 24px; font-weight: bold; color: #1A1A1A; margin-bottom: 5px; }
+        .subtitle { font-size: 14px; color: #4A4A4A; }
+        .progress { font-size: 12px; color: #6B6B6B; margin-top: 10px; }
+        
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E1E5E9;
+        }
+        
+        .question-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        
+        .option {
+            background: #F8F9FA;
+            border: 1px solid #E1E5E9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option:hover, .option.selected {
+            background: #4A90A4;
+            color: white;
+            border-color: #4A90A4;
+        }
+        
+        .btn {
+            background: #4A90A4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:disabled { background: #E1E5E9; color: #6B6B6B; cursor: not-allowed; }
+        
+        .result-card {
+            background: #4A90A4;
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .match-badge {
+            background: #52A788;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #E1E5E9;
+            position: relative;
+        }
+        
+        .product-match {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #52A788;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .routine-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #E1E5E9;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .routine-item.completed { background: #F4E4C1; }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E1E5E9;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox.checked { background: #52A788; border-color: #52A788; color: white; }
+        
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4A90A4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 20px;
+        }
+        
+        .demo-note {
+            background: #E8B4B8;
+            color: #1A1A1A;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Step 1: Skin Analysis -->
+        <div class="screen active" id="step1">
+            <div class="header">
+                <div class="title">Discover Your Skin Type</div>
+                <div class="progress">Step 1 of 5</div>
+            </div>
+            
+            <div class="demo-note">
+                🌟 Click any option to experience the app!
+            </div>
+            
+            <div class="question-card">
+                <div class="question-title">How does your skin feel in the morning?</div>
+                <div class="option" onclick="selectOption(this, 'dry')">Tight and dry</div>
+                <div class="option" onclick="selectOption(this, 'normal')">Comfortable and balanced</div>
+                <div class="option" onclick="selectOption(this, 'oily')">Oily and shiny</div>
+                <div class="option" onclick="selectOption(this, 'combination')">Oily T-zone, dry cheeks</div>
+            </div>
+            
+            <button class="btn" id="nextBtn1" onclick="nextStep()" disabled>Next</button>
+        </div>
+        
+        <!-- Step 2: Analysis Result -->
+        <div class="screen" id="step2">
+            <div class="header">
+                <div class="title">✨ Analysis Complete!</div>
+            </div>
+            
+            <div class="result-card">
+                <div class="result-title" id="skinResult">COMBINATION SKIN</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 15px;">
+                    Your T-zone is oily while cheeks are normal to dry. You need targeted care.
+                </div>
+                <div class="match-badge">95% confident</div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-title">💡 Personalized Tips:</div>
+                <div style="font-size: 14px; color: #6B6B6B;">
+                    • Use different products for T-zone and cheeks<br>
+                    • Gentle cleansing is essential<br>
+                    • Choose lightweight moisturizers
+                </div>
+            </div>
+            
+            <button class="btn" onclick="nextStep()">See Your Product Matches</button>
+        </div>
+        
+        <!-- Step 3: Product Recommendations -->
+        <div class="screen" id="step3">
+            <div class="header">
+                <div class="title">✨ Perfect Matches for You</div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-match">95%</div>
+                <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">🧴</div>
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Gentle Oat Cleanser</div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Pure Nature</div>
+                <div style="font-size: 16px; font-weight: 600; color: #4A90A4; margin-bottom: 8px;">$24.99</div>
+                <div style="font-size: 12px; color: #52A788; font-style: italic;">Perfect for your combination skin</div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-match">88%</div>
+                <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">💧</div>
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">Vitamin C Serum</div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 8px;">Glow Labs</div>
+                <div style="font-size: 16px; font-weight: 600; color: #4A90A4; margin-bottom: 8px;">$45.00</div>
+                <div style="font-size: 12px; color: #52A788; font-style: italic;">Organic, cruelty-free certified</div>
+            </div>
+            
+            <button class="btn" onclick="nextStep()">Start Your Routine</button>
+        </div>
+        
+        <!-- Step 4: Routine Tracker -->
+        <div class="screen" id="step4">
+            <div class="header">
+                <div class="title">Track Your Progress</div>
+            </div>
+            
+            <div class="progress-circle">
+                <div style="font-size: 20px; font-weight: bold;" id="progressNum">50%</div>
+                <div style="font-size: 10px;">Complete</div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-title">🌅 Morning Routine</div>
+                
+                <div class="routine-item completed" onclick="toggleRoutine(this)">
+                    <div class="checkbox checked">✓</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Gentle Cleanser</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+10</div>
+                </div>
+                
+                <div class="routine-item completed" onclick="toggleRoutine(this)">
+                    <div class="checkbox checked">✓</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Vitamin C Serum</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">1 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+15</div>
+                </div>
+                
+                <div class="routine-item" onclick="toggleRoutine(this)">
+                    <div class="checkbox"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Moisturizer</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+10</div>
+                </div>
+                
+                <div class="routine-item" onclick="toggleRoutine(this)">
+                    <div class="checkbox"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 500;">Sunscreen SPF 30+</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">2 min</div>
+                    </div>
+                    <div style="background: #4A90A4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px;">+20</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="nextStep()">Find Your Beauty Tribe</button>
+        </div>
+        
+        <!-- Step 5: Community -->
+        <div class="screen" id="step5">
+            <div class="header">
+                <div class="title">👥 Your Beauty Tribe</div>
+            </div>
+            
+            <div class="product-card">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="width: 40px; height: 40px; background: #4A90A4; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">S</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Sarah M.</div>
+                        <div style="font-size: 12px; color: #6B6B6B;">Combination skin • Curly hair</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: bold; color: #52A788;">95%</div>
+                        <div style="font-size: 10px; color: #6B6B6B;">Match</div>
+                    </div>
+                </div>
+                <div style="font-size: 14px; color: #6B6B6B; margin-bottom: 15px;">
+                    "Natural beauty enthusiast 🌿 Love sharing my skincare journey!"
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button style="background: #4A90A4; color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 12px; cursor: pointer;">Follow</button>
+                    <button style="background: #F8F9FA; color: #1A1A1A; border: 1px solid #E1E5E9; padding: 8px 16px; border-radius: 16px; font-size: 12px; cursor: pointer;">View Routine</button>
+                </div>
+            </div>
+            
+            <div class="demo-note">
+                🎉 Demo Complete! Experience personalized beauty recommendations, routine tracking, and community connections.
+            </div>
+            
+            <button class="btn" onclick="restartDemo()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedSkinType = '';
+        
+        function selectOption(element, value) {
+            document.querySelectorAll('#step1 .option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedSkinType = value;
+            document.getElementById('nextBtn1').disabled = false;
+        }
+        
+        function nextStep() {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            currentStep++;
+            
+            if (currentStep <= 5) {
+                document.getElementById('step' + currentStep).classList.add('active');
+                
+                if (currentStep === 2) {
+                    updateSkinResult();
+                }
+            }
+        }
+        
+        function updateSkinResult() {
+            const results = {
+                'dry': 'DRY SKIN',
+                'normal': 'NORMAL SKIN',
+                'oily': 'OILY SKIN',
+                'combination': 'COMBINATION SKIN'
+            };
+            document.getElementById('skinResult').textContent = results[selectedSkinType] || 'COMBINATION SKIN';
+        }
+        
+        function toggleRoutine(element) {
+            const checkbox = element.querySelector('.checkbox');
+            const isCompleted = element.classList.contains('completed');
+            
+            if (isCompleted) {
+                element.classList.remove('completed');
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+            } else {
+                element.classList.add('completed');
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+            }
+            
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const total = document.querySelectorAll('.routine-item').length;
+            const completed = document.querySelectorAll('.routine-item.completed').length;
+            const percentage = Math.round((completed / total) * 100);
+            document.getElementById('progressNum').textContent = percentage + '%';
+        }
+        
+        function restartDemo() {
+            currentStep = 1;
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('nextBtn1').disabled = true;
+            selectedSkinType = '';
+        }
+    </script>
+</body>
+</html>
