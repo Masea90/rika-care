@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
-const { initDatabase, dbHelpers } = require('./database');
+const { initDatabase, dbHelpers } = require('./backend/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,9 +42,9 @@ const upload = multer({ storage });
 // SQLite database helpers (replacing Mongoose models)
 
 // Import services
-const { recommendationEngine } = require('../shared/recommendationEngine');
-const { monetizationService } = require('./monetizationService');
-const { dermatologyExpert } = require('../shared/dermatologyExpert');
+const { recommendationEngine } = require('./shared/recommendationEngine');
+const { monetizationService } = require('./backend/monetizationService');
+const { dermatologyExpert } = require('./shared/dermatologyExpert');
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
@@ -66,8 +66,8 @@ const authenticateToken = (req, res, next) => {
 
 // Serve main HTML file at root
 app.get('/', (req, res) => {
-  const htmlPath1 = path.join(__dirname, '../web/rika-care.html');
-  const htmlPath2 = path.join(__dirname, 'rika-care.html');
+  const htmlPath1 = path.join(__dirname, 'web/rika-care.html');
+  const htmlPath2 = path.join(__dirname, 'backend/rika-care.html');
   
   res.sendFile(htmlPath1, (err) => {
     if (err) {
@@ -150,7 +150,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Debug endpoint to check users
 app.get('/api/debug/users', (req, res) => {
-  const { db } = require('./database');
+  const { db } = require('./backend/database');
   db.all('SELECT id, email, created_at FROM users', (err, rows) => {
     if (err) res.status(500).json({ error: err.message });
     else res.json(rows);
