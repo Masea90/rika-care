@@ -66,7 +66,7 @@ const authenticateToken = (req, res, next) => {
 
 // Serve main HTML file at root
 app.get('/', (req, res) => {
-  const htmlPath = path.join(__dirname, 'index.html');
+  const htmlPath = path.join(__dirname, '../rika-care.html');
   
   res.sendFile(htmlPath, (err) => {
     if (err) {
