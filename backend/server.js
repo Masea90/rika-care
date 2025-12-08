@@ -66,7 +66,19 @@ const authenticateToken = (req, res, next) => {
 
 // Serve main HTML file at root
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../web/rika-care.html'));
+  const htmlPath1 = path.join(__dirname, '../web/rika-care.html');
+  const htmlPath2 = path.join(__dirname, 'rika-care.html');
+  
+  res.sendFile(htmlPath1, (err) => {
+    if (err) {
+      res.sendFile(htmlPath2, (err2) => {
+        if (err2) {
+          console.error('Error serving HTML file:', err2);
+          res.status(500).send('RIKA Care app loading...');
+        }
+      });
+    }
+  });
 });
 
 // Authentication
