@@ -64,6 +64,11 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
+// Serve main HTML file at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../web/rika-care.html'));
+});
+
 // Authentication
 app.post('/api/auth/register', async (req, res) => {
   try {

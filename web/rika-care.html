@@ -1261,7 +1261,8 @@
     </div>
 
     <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        const API_BASE_URL = 'https://rika-care.onrender.com';
+        const API_BASE = API_BASE_URL + '/api';
         
         // Test API connection
         fetch(API_BASE + '/health').then(r => console.log('API connected')).catch(e => console.error('API connection failed:', e));
