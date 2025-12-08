@@ -73,7 +73,7 @@ app.get('/', (req, res) => {
       console.error('Error serving HTML file:', err);
       res.status(500).send(`
         <h1>RIKA Care</h1>
-        <p>✅ Backend is running! Please add index.html to the repository.</p>
+        <p>✅ Backend is running! Please add rika-care.html to the repository.</p>
         <p>API Status: Ready</p>
       `);
     }
