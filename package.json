@@ -4,7 +4,7 @@
   "description": "RIKA Care - AI-powered beauty guidance platform",
   "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node backend/server.js",
     "dev": "node backend/server.js"
   },
   "dependencies": {

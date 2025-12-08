@@ -66,16 +66,21 @@ const authenticateToken = (req, res, next) => {
 
 // Serve main HTML file at root
 app.get('/', (req, res) => {
-  const htmlPath = path.join(__dirname, '../rika-care.html');
+  const htmlPath1 = path.join(__dirname, 'rika-care.html');
+  const htmlPath2 = path.join(__dirname, '../rika-care.html');
   
-  res.sendFile(htmlPath, (err) => {
+  res.sendFile(htmlPath1, (err) => {
     if (err) {
-      console.error('Error serving HTML file:', err);
-      res.status(500).send(`
-        <h1>RIKA Care</h1>
-        <p>✅ Backend is running! Please add rika-care.html to the repository.</p>
-        <p>API Status: Ready</p>
-      `);
+      res.sendFile(htmlPath2, (err2) => {
+        if (err2) {
+          console.error('Error serving HTML file:', err2);
+          res.status(500).send(`
+            <h1>RIKA Care</h1>
+            <p>✅ Backend is running!</p>
+            <p>API Status: Ready</p>
+          `);
+        }
+      });
     }
   });
 });
