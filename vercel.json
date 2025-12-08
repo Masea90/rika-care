@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://rika-care.onrender.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/rika-care.html"
+    }
+  ]
+}
