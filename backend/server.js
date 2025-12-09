@@ -1,4 +1,4 @@
-/* const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -1435,4 +1435,4 @@ app.listen(PORT, () => {
   console.log(`🔒 Security middleware loaded`);
 });
 
-module.exports = app; */
+module.exports = app;
