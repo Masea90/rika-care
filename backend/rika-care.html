@@ -121,8 +121,30 @@
             background: #FEFCFA;
             color: #2C2C2C;
         }
-        
+
         .input:focus { outline: none; border-color: #C4A484; }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .password-wrapper .input {
+            margin-bottom: 0;
+            padding-right: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            user-select: none;
+            z-index: 10;
+        }
         
         .btn {
             background: linear-gradient(135deg, #C4A484, #B8A082);
@@ -512,19 +534,25 @@
             <div class="card" id="signupForm">
                 <div class="card-title">Create Account</div>
                 <input type="email" id="signupEmail" class="input" placeholder="Email address" required>
-                <input type="password" id="signupPassword" class="input" placeholder="Create password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="signupPassword" class="input" placeholder="Create password" required>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('signupPassword', this)">👁️</span>
+                </div>
                 <input type="text" id="signupName" class="input" placeholder="Display name" required>
-                
+
                 <button class="btn" onclick="signup()">Create Account</button>
                 <button class="btn-ghost btn" onclick="showLoginForm()">Already have an account? Log in</button>
             </div>
-            
+
             <!-- Log In Form -->
             <div class="card hidden" id="loginForm">
                 <div class="card-title">Log In</div>
                 <input type="email" id="loginEmail" class="input" placeholder="Email address" required>
-                <input type="password" id="loginPassword" class="input" placeholder="Password" required>
-                
+                <div class="password-wrapper">
+                    <input type="password" id="loginPassword" class="input" placeholder="Password" required>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('loginPassword', this)">👁️</span>
+                </div>
+
                 <button class="btn" onclick="login()">Log In</button>
                 <button class="btn-ghost btn" onclick="showSignupForm()">Need an account? Sign up</button>
             </div>
@@ -2812,6 +2840,17 @@
         function clearAuthError() {
             const errorEl = document.getElementById('authError');
             errorEl.classList.add('hidden');
+        }
+
+        function togglePasswordVisibility(inputId, toggleIcon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
         }
         
         function showUserExistsError(email) {
