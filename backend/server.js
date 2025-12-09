@@ -4,11 +4,29 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
-const { initDatabase, dbHelpers } = require('./database');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Database selection based on environment
+let initDatabase, dbHelpers;
+if (process.env.DATABASE_URL) {
+  // Use PostgreSQL in production (when DATABASE_URL is set)
+  console.log('🐘 Using PostgreSQL database');
+  const dbModule = require('./database-postgres');
+  initDatabase = dbModule.initDatabase;
+  dbHelpers = dbModule.dbHelpers;
+} else {
+  // Use SQLite for local development
+  console.log('📦 Using SQLite database');
+  const dbModule = require('./database');
+  initDatabase = dbModule.initDatabase;
+  dbHelpers = dbModule.dbHelpers;
+}
 
 // Middleware
 app.use(cors());
@@ -17,11 +35,95 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.static(path.join(__dirname, '.')));
 app.use(express.static(path.join(__dirname, '..')));
 
-// Initialize SQLite database
+// Session middleware for Passport
+app.use(session({
+  secret: process.env.JWT_SECRET || 'rika-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport serialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await dbHelpers.findUserById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+// Google OAuth Strategy (only initialize if credentials are provided)
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || '/auth/google/callback'
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Extract user info from Google profile
+        const email = profile.emails[0].value;
+        const displayName = profile.displayName || profile.name?.givenName || email.split('@')[0];
+        const googleId = profile.id;
+
+        // Check if user exists
+        let user = await dbHelpers.findUserByEmail(email);
+
+        if (user) {
+          // User exists - update Google ID if not set
+          if (!user.googleId) {
+            await dbHelpers.updateUser(user.id, { googleId });
+          }
+        } else {
+          // Create new user
+          const userProfile = {
+            personalInfo: {
+              name: displayName
+            },
+            community: {},
+            skincare: {},
+            preferences: {
+              language: 'en'
+            }
+          };
+
+          user = await dbHelpers.createUser({
+            email,
+            password: '', // No password for OAuth users
+            googleId,
+            profile: userProfile,
+            subscription: { tier: 'FREE', features: ['basic_recommendations', 'community_access'] }
+          });
+        }
+
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }
+  ));
+  console.log('✅ Google OAuth configured');
+} else {
+  console.log('⚠️  Google OAuth not configured (set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)');
+}
+
+// Initialize database
 initDatabase().then(() => {
-  console.log('✅ SQLite database initialized');
-  
-  // Initialize with sample data in production if needed
+  const dbType = process.env.DATABASE_URL ? 'PostgreSQL' : 'SQLite';
+  console.log(`✅ ${dbType} database initialized`);
+
   if (NODE_ENV === 'production') {
     console.log('🚀 Production database ready');
   }
@@ -126,7 +228,7 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     const user = await dbHelpers.findUserByEmail(email);
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials', error: 'Invalid credentials' });
@@ -155,6 +257,32 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
+
+// Google OAuth Routes
+app.get('/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
+  })
+);
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/?error=oauth_failed',
+    session: false
+  }),
+  (req, res) => {
+    try {
+      // Generate JWT token
+      const token = jwt.sign({ userId: req.user.id }, process.env.JWT_SECRET || 'rika-secret');
+
+      // Redirect to frontend with token
+      res.redirect(`/?token=${token}&email=${encodeURIComponent(req.user.email)}`);
+    } catch (error) {
+      res.redirect('/?error=token_generation_failed');
+    }
+  }
+);
 
 // User Profile
 app.get('/api/user/profile', authenticateToken, async (req, res) => {

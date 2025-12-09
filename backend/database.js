@@ -13,6 +13,7 @@ const initDatabase = () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
+        googleId TEXT,
         profile TEXT,
         subscription TEXT,
         analytics TEXT,
