@@ -3005,17 +3005,17 @@
         async function handleOAuthCallback() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
-            const email = urlParams.get('email');
+            const googleSuccess = urlParams.get('google');
             const error = urlParams.get('error');
 
             if (error) {
                 showAuthError('Google sign-in failed. Please try again.');
                 // Clean URL
-                window.history.replaceState({}, document.title, '/');
+                window.history.replaceState({}, document.title, '/rika-care.html');
                 return;
             }
 
-            if (token && email) {
+            if (token && googleSuccess) {
                 try {
                     // Store token
                     authToken = token;
@@ -3035,7 +3035,7 @@
                     };
 
                     // Clean URL
-                    window.history.replaceState({}, document.title, '/');
+                    window.history.replaceState({}, document.title, '/rika-care.html');
 
                     // Check if user needs onboarding
                     if (needsPrivacyOnboarding()) {

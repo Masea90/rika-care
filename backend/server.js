@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { initDatabase, dbHelpers } = require('./database');
 
 const app = express();
@@ -11,15 +14,86 @@ const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Session configuration for Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'rika-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/uploads', express.static('uploads'));
 app.use(express.static('.'));
+
+// Passport Google OAuth Configuration
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID || 'your-client-id.apps.googleusercontent.com',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-client-secret',
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    // Check if user exists
+    let user = await dbHelpers.findUserByEmail(profile.emails[0].value);
+
+    if (!user) {
+      // Create new user from Google profile
+      user = await dbHelpers.createUser({
+        email: profile.emails[0].value,
+        password: '', // No password for Google OAuth users
+        googleId: profile.id,
+        profile: {
+          personalInfo: {
+            name: profile.displayName,
+            profilePicture: profile.photos?.[0]?.value
+          }
+        },
+        subscription: { tier: 'FREE', features: ['basic_recommendations', 'community_access'] }
+      });
+    } else if (!user.googleId) {
+      // Link Google account to existing email user
+      await dbHelpers.updateUser(user.id, { googleId: profile.id });
+    }
+
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+// Serialize user for session
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+// Deserialize user from session
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await dbHelpers.findUserById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
 
 // Initialize SQLite database
 initDatabase().then(() => {
   console.log('✅ SQLite database initialized');
-  
+
   // Initialize with sample data in production if needed
   if (NODE_ENV === 'production') {
     console.log('🚀 Production database ready');
@@ -146,6 +220,22 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
+// Google OAuth Routes
+app.get('/api/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/api/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/rika-care.html?error=google_auth_failed' }),
+  (req, res) => {
+    // Successful authentication
+    const token = jwt.sign({ userId: req.user.id }, process.env.JWT_SECRET || 'rika-secret');
+
+    // Redirect to app with token
+    res.redirect(`/rika-care.html?token=${token}&google=success`);
+  }
+);
 
 // Debug endpoint to check users
 app.get('/api/debug/users', (req, res) => {
