@@ -1162,6 +1162,16 @@
                     <option value="male">Male</option>
                     <option value="other">Other</option>
                 </select>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 14px; color: #6B5B73; margin-bottom: 4px; display: block;">Language / Idioma / Langue</label>
+                    <select id="profileLanguageSelect" onchange="changeProfileLanguage()" class="input" style="margin-bottom: 0;">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                </div>
+
                 <button class="btn" onclick="saveProfile()" style="margin-top: 8px;">Save Changes</button>
             </div>
             
@@ -1462,26 +1472,31 @@
         // Load profile data into form
         function loadProfileForm() {
             if (!currentUser?.profile?.personalInfo) return;
-            
+
             const info = currentUser.profile.personalInfo;
             const nameField = document.getElementById('profileName');
             const ageField = document.getElementById('profileAge');
             const genderField = document.getElementById('profileGender');
-            
+
             if (nameField) nameField.value = info.name || '';
             if (ageField) ageField.value = info.age || '';
             if (genderField) genderField.value = info.gender || '';
-            
+
+            // Load language preference
+            const savedLanguage = currentUser.profile?.preferences?.language || localStorage.getItem('rika-language') || 'en';
+            const profileLanguageSelect = document.getElementById('profileLanguageSelect');
+            if (profileLanguageSelect) profileLanguageSelect.value = savedLanguage;
+
             // Load beauty profile settings
             const skinProfile = currentUser.profile.skinProfile || {};
             const hairProfile = currentUser.profile.hairProfile || {};
-            
+
             const skinConcernSelect = document.getElementById('skinConcernSelect');
             const hairTypeSelect = document.getElementById('hairTypeSelect');
-            
+
             if (skinConcernSelect) skinConcernSelect.value = skinProfile.primaryConcern || '';
             if (hairTypeSelect) hairTypeSelect.value = hairProfile.type || '';
-            
+
             // Load ingredient preferences
             const avoidIngredients = skinProfile.avoidIngredients || [];
             if (document.getElementById('avoidFragrance')) document.getElementById('avoidFragrance').checked = avoidIngredients.includes('fragrance');
@@ -3008,6 +3023,25 @@
                 everyone: 'Everyone',
                 onlyMe: 'Only Me',
                 continue: 'Continue',
+                // Beauty Profile
+                completeYourProfile: 'Complete Your Profile',
+                helpUsPersonalize: 'Help us personalize your experience',
+                tellUsAboutYourself: 'Tell us about yourself',
+                optionalButRecommended: 'Optional but Recommended',
+                thisHelpsProvide: 'This helps us provide better recommendations and connect you with similar users.',
+                continueToSkinQuiz: 'Continue to Skin Quiz',
+                skipForNow: 'Skip for Now',
+                // Skin Quiz
+                knowYourSkin: 'Know Your Skin',
+                quickAssessment: 'Quick assessment for personalized guidance',
+                whatPrimaryConcern: 'What\'s your primary skin concern?',
+                drynessDehydration: 'Dryness & Dehydration',
+                acneBreakouts: 'Acne & Breakouts',
+                fineLinesAging: 'Fine Lines & Aging',
+                sensitivityRedness: 'Sensitivity & Redness',
+                dullnessUnevenTone: 'Dullness & Uneven Tone',
+                continueToAIScan: 'Continue to AI Scan',
+                skipScanForNow: 'Skip Scan for Now',
                 // Dashboard
                 naturalBeautyDashboard: 'Your natural beauty dashboard',
                 naturalGlowScore: 'Your Natural Glow Score',
@@ -3063,6 +3097,25 @@
                 everyone: 'Todos',
                 onlyMe: 'Solo Yo',
                 continue: 'Continuar',
+                // Beauty Profile
+                completeYourProfile: 'Completa Tu Perfil',
+                helpUsPersonalize: 'Ayúdanos a personalizar tu experiencia',
+                tellUsAboutYourself: 'Cuéntanos sobre ti',
+                optionalButRecommended: 'Opcional pero Recomendado',
+                thisHelpsProvide: 'Esto nos ayuda a proporcionar mejores recomendaciones y conectarte con usuarios similares.',
+                continueToSkinQuiz: 'Continuar al Cuestionario de Piel',
+                skipForNow: 'Omitir por Ahora',
+                // Skin Quiz
+                knowYourSkin: 'Conoce Tu Piel',
+                quickAssessment: 'Evaluación rápida para orientación personalizada',
+                whatPrimaryConcern: '¿Cuál es tu principal preocupación de piel?',
+                drynessDehydration: 'Sequedad y Deshidratación',
+                acneBreakouts: 'Acné y Brotes',
+                fineLinesAging: 'Líneas Finas y Envejecimiento',
+                sensitivityRedness: 'Sensibilidad y Rojeces',
+                dullnessUnevenTone: 'Opacidad y Tono Irregular',
+                continueToAIScan: 'Continuar al Análisis IA',
+                skipScanForNow: 'Omitir Análisis por Ahora',
                 // Dashboard
                 naturalBeautyDashboard: 'Tu panel de belleza natural',
                 naturalGlowScore: 'Tu Puntuación de Brillo Natural',
@@ -3118,6 +3171,25 @@
                 everyone: 'Tout le Monde',
                 onlyMe: 'Seulement Moi',
                 continue: 'Continuer',
+                // Beauty Profile
+                completeYourProfile: 'Complétez Votre Profil',
+                helpUsPersonalize: 'Aidez-nous à personnaliser votre expérience',
+                tellUsAboutYourself: 'Parlez-nous de vous',
+                optionalButRecommended: 'Optionnel mais Recommandé',
+                thisHelpsProvide: 'Cela nous aide à fournir de meilleures recommandations et à vous connecter avec des utilisateurs similaires.',
+                continueToSkinQuiz: 'Continuer au Quiz Peau',
+                skipForNow: 'Passer pour l\'Instant',
+                // Skin Quiz
+                knowYourSkin: 'Connaissez Votre Peau',
+                quickAssessment: 'Évaluation rapide pour des conseils personnalisés',
+                whatPrimaryConcern: 'Quelle est votre principale préoccupation cutanée?',
+                drynessDehydration: 'Sécheresse et Déshydratation',
+                acneBreakouts: 'Acné et Éruptions',
+                fineLinesAging: 'Rides et Vieillissement',
+                sensitivityRedness: 'Sensibilité et Rougeurs',
+                dullnessUnevenTone: 'Teint Terne et Irrégulier',
+                continueToAIScan: 'Continuer à l\'Analyse IA',
+                skipScanForNow: 'Passer l\'Analyse pour l\'Instant',
                 // Dashboard
                 naturalBeautyDashboard: 'Votre tableau de beauté naturelle',
                 yourSkinToday: 'Votre Peau Aujourd\'hui',
@@ -3188,6 +3260,23 @@
                 'Everyone': t.everyone,
                 'Only Me': t.onlyMe,
                 'Continue': t.continue,
+                'Complete Your Profile': t.completeYourProfile,
+                'Help us personalize your experience': t.helpUsPersonalize,
+                'Tell us about yourself': t.tellUsAboutYourself,
+                'Optional but Recommended': t.optionalButRecommended,
+                'This helps us provide better recommendations and connect you with similar users.': t.thisHelpsProvide,
+                'Continue to Skin Quiz': t.continueToSkinQuiz,
+                'Skip for Now': t.skipForNow,
+                'Know Your Skin': t.knowYourSkin,
+                'Quick assessment for personalized guidance': t.quickAssessment,
+                'What\'s your primary skin concern?': t.whatPrimaryConcern,
+                'Dryness & Dehydration': t.drynessDehydration,
+                'Acne & Breakouts': t.acneBreakouts,
+                'Fine Lines & Aging': t.fineLinesAging,
+                'Sensitivity & Redness': t.sensitivityRedness,
+                'Dullness & Uneven Tone': t.dullnessUnevenTone,
+                'Continue to AI Scan': t.continueToAIScan,
+                'Skip Scan for Now': t.skipScanForNow,
                 'Your Natural Glow Score': t.naturalGlowScore,
                 'This week\'s wellness journey': t.thisWeekWellness,
                 'Your Skin Today': t.yourSkinToday,
@@ -3236,7 +3325,7 @@
             const selectedLanguage = document.getElementById('loginLanguageSelect').value;
             localStorage.setItem('rika-language', selectedLanguage);
             updateLanguage(selectedLanguage);
-            
+
             // Save to user profile if logged in
             if (authToken && currentUser) {
                 try {
@@ -3247,7 +3336,7 @@
                             language: selectedLanguage
                         }
                     };
-                    
+
                     await fetch(API_BASE + '/user/profile', {
                         method: 'PUT',
                         headers: {
@@ -3256,8 +3345,50 @@
                         },
                         body: JSON.stringify({ profile: updatedProfile })
                     });
-                    
+
                     currentUser.profile = updatedProfile;
+                } catch (error) {
+                    console.log('Language preference will be saved later');
+                }
+            }
+        }
+
+        async function changeProfileLanguage() {
+            const selectedLanguage = document.getElementById('profileLanguageSelect').value;
+            localStorage.setItem('rika-language', selectedLanguage);
+            updateLanguage(selectedLanguage);
+
+            // Save to user profile
+            if (authToken && currentUser) {
+                try {
+                    const updatedProfile = {
+                        ...currentUser.profile,
+                        preferences: {
+                            ...currentUser.profile.preferences,
+                            language: selectedLanguage
+                        }
+                    };
+
+                    await fetch(API_BASE + '/user/profile', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ profile: updatedProfile })
+                    });
+
+                    currentUser.profile = updatedProfile;
+
+                    // Show success feedback
+                    const notification = document.createElement('div');
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #E8F5E8; color: #166534; padding: 12px 16px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease;';
+                    notification.textContent = 'Language updated successfully!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
                 } catch (error) {
                     console.log('Language preference will be saved later');
                 }
