@@ -93,7 +93,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     const existingUser = await dbHelpers.findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ success: false, message: 'User already exists', error: 'User already exists' });
     }
 
     // Ensure user has a name - extract from email if not provided
@@ -112,11 +112,11 @@ app.post('/api/auth/register', async (req, res) => {
       profile: userProfile,
       subscription: { tier: 'FREE', features: ['basic_recommendations', 'community_access'] }
     });
-    
+
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'rika-secret');
-    res.json({ token, user: { id: user.id, email: user.email, profile: user.profile } });
+    res.json({ success: true, token, user: { id: user.id, email: user.email, profile: user.profile } });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
@@ -126,7 +126,7 @@ app.post('/api/auth/login', async (req, res) => {
     
     const user = await dbHelpers.findUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials', error: 'Invalid credentials' });
     }
 
     // Check if password is hashed (starts with $2a$ or $2b$) or plain text (legacy)
@@ -143,13 +143,13 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     if (!passwordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials', error: 'Invalid credentials' });
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'rika-secret');
-    res.json({ token, user: { id: user.id, email: user.email, profile: user.profile } });
+    res.json({ success: true, token, user: { id: user.id, email: user.email, profile: user.profile } });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
