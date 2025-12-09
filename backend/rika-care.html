@@ -2192,7 +2192,7 @@
                 loadUserPoints(),
                 loadUserStreak()
             ]);
-            
+
             // Award daily hydration check points (once per day)
             const lastHydrationCheck = localStorage.getItem('lastHydrationCheck');
             const today = new Date().toDateString();
@@ -2200,6 +2200,10 @@
                 addPoints('Daily hydration check', 5);
                 localStorage.setItem('lastHydrationCheck', today);
             }
+
+            // Reapply language translations after data loads
+            const savedLanguage = localStorage.getItem('rika-language') || 'en';
+            setTimeout(() => updateLanguage(savedLanguage), 200);
         }
         
         // Update screens when tabs are shown
