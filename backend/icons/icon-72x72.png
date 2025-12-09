@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <rect width="72" height="72" fill="#C4A484" rx="16"/>
+  <circle cx="36" cy="28" r="8" fill="#FFF9F5" opacity="0.9"/>
+  <path d="M 20 45 Q 28 38 36 45 Q 44 38 52 45" stroke="#FFF9F5" stroke-width="3" fill="none" opacity="0.9"/>
+  <text x="36" y="58" font-family="Arial, sans-serif" font-size="10" fill="#FFF9F5" text-anchor="middle" font-weight="bold">RIKA</text>
+</svg>

@@ -4,13 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>RIKA Care - Real beauty. Real guidance.</title>
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#C4A484">
+
+    <!-- iOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RIKA Care">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.svg">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.svg">
+
+    <!-- Android PWA Support -->
     <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon-72x72.svg">
+
+    <!-- SEO & Social -->
+    <meta name="description" content="Your personal AI-powered beauty companion for natural skincare and haircare recommendations">
+    <meta name="keywords" content="skincare, haircare, natural beauty, AI recommendations, RIKA Care">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="RIKA Care - Real beauty. Real guidance.">
+    <meta property="og:description" content="Your personal AI-powered beauty companion for natural skincare and haircare">
+    <meta property="og:image" content="/icons/icon-512x512.svg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RIKA Care - Real beauty. Real guidance.">
+    <meta name="twitter:description" content="Your personal AI-powered beauty companion">
+    <meta name="twitter:image" content="/icons/icon-512x512.svg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -3741,6 +3767,117 @@
                 loadDashboardData();
             }
         };
+
+        // ========================================
+        // PWA Service Worker Registration
+        // ========================================
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered successfully:', registration.scope);
+
+                        // Check for updates periodically
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000); // Check every minute
+
+                        // Handle service worker updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New service worker available
+                                    console.log('🔄 New version available! Please refresh.');
+
+                                    // Show update notification
+                                    if (confirm('A new version of RIKA Care is available! Refresh to update?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ Service Worker registration failed:', error);
+                    });
+
+                // Handle service worker controller change (after update)
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('🔄 Service Worker updated, reloading page...');
+                    window.location.reload();
+                });
+            });
+        } else {
+            console.warn('⚠️ Service Workers are not supported in this browser');
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA Install prompt available');
+
+            // Prevent the default mini-infobar
+            e.preventDefault();
+
+            // Save the event for later
+            deferredPrompt = e;
+
+            // Show custom install button (if you want to add one)
+            // You can add an "Install App" button in your UI and trigger it manually
+        });
+
+        // Track PWA installation
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA installed successfully!');
+            deferredPrompt = null;
+
+            // You can track this event with analytics
+            // trackEvent('pwa_installed');
+        });
+
+        // Optional: Function to trigger install prompt manually
+        window.promptPWAInstall = async () => {
+            if (!deferredPrompt) {
+                console.log('PWA install prompt not available');
+                return false;
+            }
+
+            // Show the install prompt
+            deferredPrompt.prompt();
+
+            // Wait for the user's response
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to install prompt: ${outcome}`);
+
+            // Clear the saved prompt since it can't be used again
+            deferredPrompt = null;
+
+            return outcome === 'accepted';
+        };
+
+        // Handle PWA launch (standalone mode detection)
+        if (window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true) {
+            console.log('🚀 Running as installed PWA');
+            // You can add PWA-specific behavior here
+            // For example, hide browser-specific UI elements
+        }
+
+        // Handle online/offline status
+        window.addEventListener('online', () => {
+            console.log('🌐 Back online');
+            // You can show a notification or update UI
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📡 Gone offline');
+            // You can show an offline indicator in your UI
+        });
     </script>
 </body>
 </html>

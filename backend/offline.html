@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - RIKA Care</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #FFF9F5 0%, #F5E6D3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 400px;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        h1 {
+            color: #6B5B73;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #8B7B93;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, #C4A484 0%, #B89474 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(196, 164, 132, 0.3);
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196, 164, 132, 0.4);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .features-note {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>It looks like you've lost your internet connection. RIKA Care needs an active connection to provide personalized beauty recommendations.</p>
+
+        <div class="connection-status">
+            <span class="status-indicator"></span>
+            <strong>Waiting for connection...</strong>
+        </div>
+
+        <button class="retry-button" onclick="retryConnection()">
+            🔄 Retry Connection
+        </button>
+
+        <p class="features-note">
+            Some features like offline browsing will be available in future updates.
+        </p>
+    </div>
+
+    <script>
+        // Auto-retry when connection is restored
+        window.addEventListener('online', () => {
+            console.log('Connection restored!');
+            location.reload();
+        });
+
+        // Update status indicator when online/offline
+        window.addEventListener('offline', () => {
+            console.log('Connection lost');
+        });
+
+        // Manual retry button
+        function retryConnection() {
+            if (navigator.onLine) {
+                window.location.href = '/rika-care.html';
+            } else {
+                alert('Still offline. Please check your internet connection.');
+            }
+        }
+
+        // Check connection status periodically
+        setInterval(() => {
+            if (navigator.onLine) {
+                const statusDiv = document.querySelector('.connection-status');
+                statusDiv.innerHTML = '<span style="display: inline-block; width: 12px; height: 12px; background: #28a745; border-radius: 50%; margin-right: 8px;"></span><strong>Connection restored!</strong>';
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+
+                // Auto-redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/rika-care.html';
+                }, 2000);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

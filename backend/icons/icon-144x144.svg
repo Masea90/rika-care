@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
+  <defs>
+    <linearGradient id="grad-144" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C4A484;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B89474;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="144" height="144" fill="url(#grad-144)" rx="31.68"/>
+
+  <!-- Leaf icon representing natural beauty -->
+  <g transform="translate(72, 72)">
+    <!-- Stem -->
+    <line x1="0" y1="7.2" x2="0" y2="-28.8" stroke="#FFF9F5" stroke-width="4.32" opacity="0.95"/>
+
+    <!-- Left leaf -->
+    <path d="M 0,0 Q -21.599999999999998,-14.4 -28.8,-36 Q -17.28,-21.599999999999998 0,0"
+          fill="#FFF9F5" opacity="0.9"/>
+
+    <!-- Right leaf -->
+    <path d="M 0,0 Q 21.599999999999998,-14.4 28.8,-36 Q 17.28,-21.599999999999998 0,0"
+          fill="#FFF9F5" opacity="0.9"/>
+
+    <!-- Center leaf -->
+    <path d="M 0,0 Q 0,-28.8 0,-50.4 Q 0,-25.919999999999998 0,0"
+          fill="#FFF9F5" opacity="0.95" stroke="#FFF9F5" stroke-width="2.88"/>
+  </g>
+
+  <!-- RIKA text (only show on larger icons) -->
+  
+</svg>
