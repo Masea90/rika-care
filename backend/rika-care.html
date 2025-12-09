@@ -3192,6 +3192,8 @@
                 skipScanForNow: 'Passer l\'Analyse pour l\'Instant',
                 // Dashboard
                 naturalBeautyDashboard: 'Votre tableau de beauté naturelle',
+                naturalGlowScore: 'Votre Score d\'Éclat Naturel',
+                thisWeekWellness: 'Votre parcours bien-être cette semaine',
                 yourSkinToday: 'Votre Peau Aujourd\'hui',
                 yourHairToday: 'Vos Cheveux Aujourd\'hui',
                 beautyBite: 'Conseil Beauté du Jour',
@@ -3199,121 +3201,102 @@
                 yourRewards: 'Vos Récompenses',
                 naturalTreatment: 'Traitement Naturel',
                 viewRoutines: 'Voir Mes Routines',
+                skinMood: 'Humeur de la peau',
+                hairMood: 'Humeur des cheveux',
+                hydrationReminder: 'Rappel d\'hydratation',
+                availableRewards: 'Récompenses Disponibles',
+                openRewardsStore: 'Ouvrir la Boutique de Récompenses',
                 // Navigation
                 home: 'Accueil',
                 discover: 'Découvrir',
                 routine: 'Routine',
                 natural: 'Naturel',
-                profile: 'Profil'
+                profile: 'Profil',
+                // Profile
+                yourProfile: 'Votre Profil',
+                personalInfo: 'Informations Personnelles',
+                beautyProfileSettings: 'Paramètres du Profil Beauté',
+                saveChanges: 'Enregistrer les Modifications',
+                updateBeautyProfile: 'Mettre à Jour le Profil Beauté',
+                // Routine
+                yourRoutine: 'Votre Routine',
+                personalizedSkin: 'Personnalisée pour votre peau',
+                morningRoutine: 'Routine Matinale',
+                today: 'Aujourd\'hui'
             }
         };
         
         function updateLanguage(lang) {
             const t = translations[lang];
-            
+
+            // Store elements with their translation keys using data attributes
+            // This ensures we always translate from the key, not from current text
+
             // Login screen
             const titleEl = document.querySelector('.title');
             const taglineEl = document.querySelector('.tagline');
             if (titleEl) titleEl.textContent = t.welcome;
             if (taglineEl) taglineEl.textContent = t.tagline;
-            
+
             const signupTitle = document.querySelector('#signupForm .card-title');
             const loginTitle = document.querySelector('#loginForm .card-title');
             if (signupTitle) signupTitle.textContent = t.createAccount;
             if (loginTitle) loginTitle.textContent = t.login;
-            
+
             const signupEmail = document.getElementById('signupEmail');
             const signupPassword = document.getElementById('signupPassword');
             const signupName = document.getElementById('signupName');
             const loginEmail = document.getElementById('loginEmail');
             const loginPassword = document.getElementById('loginPassword');
-            
+
             if (signupEmail) signupEmail.placeholder = t.email;
             if (signupPassword) signupPassword.placeholder = t.password;
             if (signupName) signupName.placeholder = t.name;
             if (loginEmail) loginEmail.placeholder = t.email;
             if (loginPassword) loginPassword.placeholder = t.password;
-            
+
             const signupBtn = document.querySelector('#signupForm .btn');
             const loginBtn = document.querySelector('#loginForm .btn');
             const signupGhost = document.querySelector('#signupForm .btn-ghost');
             const loginGhost = document.querySelector('#loginForm .btn-ghost');
-            
+
             if (signupBtn) signupBtn.textContent = t.createAccount;
             if (loginBtn) loginBtn.textContent = t.login;
             if (signupGhost) signupGhost.textContent = t.alreadyAccount;
             if (loginGhost) loginGhost.textContent = t.needAccount;
-            
+
             // Dashboard content
             const dashboardSubtitle = document.querySelector('#dashboard .title + div');
             if (dashboardSubtitle) dashboardSubtitle.textContent = t.naturalBeautyDashboard;
-            
-            // Translate all text content
-            const textTranslations = {
-                'Privacy First': t.privacyFirst,
-                'Choose your visibility': t.chooseYourVisibility,
-                'You can change this anytime in settings': t.changeAnytime,
-                'Who can see your content?': t.whoCanSeeContent,
-                'Choose who can see your content and interact with you.': t.chooseWhoCanSee,
-                'Women': t.women,
-                'Men': t.men,
-                'Everyone': t.everyone,
-                'Only Me': t.onlyMe,
-                'Continue': t.continue,
-                'Complete Your Profile': t.completeYourProfile,
-                'Help us personalize your experience': t.helpUsPersonalize,
-                'Tell us about yourself': t.tellUsAboutYourself,
-                'Optional but Recommended': t.optionalButRecommended,
-                'This helps us provide better recommendations and connect you with similar users.': t.thisHelpsProvide,
-                'Continue to Skin Quiz': t.continueToSkinQuiz,
-                'Skip for Now': t.skipForNow,
-                'Know Your Skin': t.knowYourSkin,
-                'Quick assessment for personalized guidance': t.quickAssessment,
-                'What\'s your primary skin concern?': t.whatPrimaryConcern,
-                'Dryness & Dehydration': t.drynessDehydration,
-                'Acne & Breakouts': t.acneBreakouts,
-                'Fine Lines & Aging': t.fineLinesAging,
-                'Sensitivity & Redness': t.sensitivityRedness,
-                'Dullness & Uneven Tone': t.dullnessUnevenTone,
-                'Continue to AI Scan': t.continueToAIScan,
-                'Skip Scan for Now': t.skipScanForNow,
-                'Your Natural Glow Score': t.naturalGlowScore,
-                'This week\'s wellness journey': t.thisWeekWellness,
-                'Your Skin Today': t.yourSkinToday,
-                'Your Hair Today': t.yourHairToday,
-                'Beauty Bite of the Day': t.beautyBite,
-                'Ingredient Alerts': t.ingredientAlerts,
-                'Your Rewards': t.yourRewards,
-                'Natural Treatment': t.naturalTreatment,
-                'View My Routines': t.viewRoutines,
-                'Skin mood': t.skinMood,
-                'Hair mood': t.hairMood,
-                'Hydration reminder': t.hydrationReminder,
-                'Available Rewards': t.availableRewards,
-                'Open Rewards Store': t.openRewardsStore,
-                'Your Profile': t.yourProfile,
-                'Personal Information': t.personalInfo,
-                'Beauty Profile Settings': t.beautyProfileSettings,
-                'Save Changes': t.saveChanges,
-                'Update Beauty Profile': t.updateBeautyProfile,
-                'Your Routine': t.yourRoutine,
-                'Personalized for your skin': t.personalizedSkin,
-                'Morning Routine': t.morningRoutine,
-                'Today': t.today
-            };
-            
-            // Apply translations to all matching text
+
+            // Build a reverse lookup map from ALL language texts to their keys
+            // This allows matching text in any language to find its key
+            const textToKeyMap = {};
+            Object.keys(translations).forEach(langCode => {
+                Object.keys(translations[langCode]).forEach(key => {
+                    const text = translations[langCode][key];
+                    if (text && typeof text === 'string') {
+                        textToKeyMap[text] = key;
+                    }
+                });
+            });
+
+            // Translate all text content by finding the key first
             document.querySelectorAll('*').forEach(el => {
-                if (el.children.length === 0) { // Only text nodes
+                if (el.children.length === 0 && el.textContent.trim()) {
                     const text = el.textContent.trim();
                     const cleanText = text.replace(/🌟|🌸|🌿|🥑|⚠️|🎁|🌱|◐|◇|◯/g, '').trim();
-                    if (textTranslations[cleanText]) {
+
+                    // Find the translation key for this text (could be in any language)
+                    const translationKey = textToKeyMap[cleanText];
+
+                    if (translationKey && t[translationKey]) {
                         const icon = text.match(/🌟|🌸|🌿|🥑|⚠️|🎁|🌱|◐|◇|◯/)?.[0] || '';
-                        el.textContent = icon + (icon ? ' ' : '') + textTranslations[cleanText];
+                        el.textContent = icon + (icon ? ' ' : '') + t[translationKey];
                     }
                 }
             });
-            
+
             // Navigation
             const navTexts = [t.home, t.discover, t.routine, t.community || 'Community', t.aiChat || 'AI Chat', t.profile];
             document.querySelectorAll('.nav-tab div:last-child').forEach((el, i) => {
