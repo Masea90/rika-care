@@ -43,9 +43,9 @@ const upload = multer({ storage });
 // SQLite database helpers (replacing Mongoose models)
 
 // Import services
-const { recommendationEngine } = require('../shared/recommendationEngine');
-const { monetizationService } = require('./monetizationService');
-const { dermatologyExpert } = require('../shared/dermatologyExpert');
+const { recommendationEngine } = require('./shared/recommendationEngine');
+const { monetizationService } = require('./backend/monetizationService');
+const { dermatologyExpert } = require('./shared/dermatologyExpert');
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
