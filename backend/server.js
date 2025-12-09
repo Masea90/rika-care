@@ -138,10 +138,21 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
+// Serve rika-care.html with no-cache headers to prevent stale content
+app.get('/rika-care.html', (req, res) => {
+  // Set cache-control headers to prevent caching
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  const htmlPath = path.join(__dirname, 'rika-care.html');
+  res.sendFile(htmlPath);
+});
+
 // Serve main HTML file at root
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'index.html');
-  
+
   res.sendFile(htmlPath, (err) => {
     if (err) {
       console.error('Error serving HTML file:', err);
