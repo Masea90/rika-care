@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
-const { initDatabase, dbHelpers } = require('./database');
+const { initDatabase, dbHelpers } = require('./backend/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
