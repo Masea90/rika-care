@@ -2763,6 +2763,10 @@
             } else {
                 navTabs.style.display = 'flex';
             }
+
+            // Apply language translations to the newly shown screen
+            const savedLanguage = localStorage.getItem('rika-language') || 'en';
+            setTimeout(() => updateLanguage(savedLanguage), 50);
         }
 
         function showTab(tabId) {
@@ -2993,6 +2997,17 @@
                 name: 'Display name',
                 alreadyAccount: 'Already have an account? Log in',
                 needAccount: 'Need an account? Sign up',
+                // Privacy First
+                privacyFirst: 'Privacy First',
+                chooseYourVisibility: 'Choose your visibility',
+                changeAnytime: 'You can change this anytime in settings',
+                whoCanSeeContent: 'Who can see your content?',
+                chooseWhoCanSee: 'Choose who can see your content and interact with you.',
+                women: 'Women',
+                men: 'Men',
+                everyone: 'Everyone',
+                onlyMe: 'Only Me',
+                continue: 'Continue',
                 // Dashboard
                 naturalBeautyDashboard: 'Your natural beauty dashboard',
                 naturalGlowScore: 'Your Natural Glow Score',
@@ -3037,6 +3052,17 @@
                 name: 'Nombre para mostrar',
                 alreadyAccount: '¿Ya tienes cuenta? Inicia sesión',
                 needAccount: '¿Necesitas una cuenta? Regístrate',
+                // Privacy First
+                privacyFirst: 'Privacidad Primero',
+                chooseYourVisibility: 'Elige tu visibilidad',
+                changeAnytime: 'Puedes cambiar esto en cualquier momento en la configuración',
+                whoCanSeeContent: '¿Quién puede ver tu contenido?',
+                chooseWhoCanSee: 'Elige quién puede ver tu contenido e interactuar contigo.',
+                women: 'Mujeres',
+                men: 'Hombres',
+                everyone: 'Todos',
+                onlyMe: 'Solo Yo',
+                continue: 'Continuar',
                 // Dashboard
                 naturalBeautyDashboard: 'Tu panel de belleza natural',
                 naturalGlowScore: 'Tu Puntuación de Brillo Natural',
@@ -3141,6 +3167,16 @@
             
             // Translate all text content
             const textTranslations = {
+                'Privacy First': t.privacyFirst,
+                'Choose your visibility': t.chooseYourVisibility,
+                'You can change this anytime in settings': t.changeAnytime,
+                'Who can see your content?': t.whoCanSeeContent,
+                'Choose who can see your content and interact with you.': t.chooseWhoCanSee,
+                'Women': t.women,
+                'Men': t.men,
+                'Everyone': t.everyone,
+                'Only Me': t.onlyMe,
+                'Continue': t.continue,
                 'Your Natural Glow Score': t.naturalGlowScore,
                 'This week\'s wellness journey': t.thisWeekWellness,
                 'Your Skin Today': t.yourSkinToday,
