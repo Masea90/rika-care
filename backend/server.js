@@ -65,11 +65,11 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
-// Serve main HTML file at root
-app.get('/', (req, res) => {
+// Serve main HTML file at root and /app.html
+const serveMainApp = (req, res) => {
   const htmlPath1 = path.join(__dirname, 'rika-care.html');
   const htmlPath2 = path.join(__dirname, '../rika-care.html');
-  
+
   res.sendFile(htmlPath1, (err) => {
     if (err) {
       res.sendFile(htmlPath2, (err2) => {
@@ -84,7 +84,10 @@ app.get('/', (req, res) => {
       });
     }
   });
-});
+};
+
+app.get('/', serveMainApp);
+app.get('/app.html', serveMainApp);
 
 // Authentication
 app.post('/api/auth/register', async (req, res) => {
