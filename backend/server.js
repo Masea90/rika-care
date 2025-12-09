@@ -153,6 +153,197 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// User Profile
+app.get('/api/user/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await dbHelpers.findUserById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ profile: user.profile, email: user.email });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/user/profile', authenticateToken, async (req, res) => {
+  try {
+    const { profile } = req.body;
+    await dbHelpers.updateUser(req.user.userId, { profile });
+    res.json({ success: true, profile });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Products
+app.get('/api/products', authenticateToken, async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const cleanOnly = req.query.cleanOnly === 'true';
+
+    let products = await dbHelpers.getAllProducts(limit);
+
+    if (cleanOnly) {
+      products = products.filter(p => p.isCleanBeauty || p.flags?.isNatural);
+    }
+
+    res.json({ products });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/products/:id', authenticateToken, async (req, res) => {
+  try {
+    const product = await dbHelpers.getProductById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ product });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Routines
+app.get('/api/routines', authenticateToken, async (req, res) => {
+  try {
+    const routines = await dbHelpers.getUserRoutines(req.user.userId);
+    res.json({ routines });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/routines', authenticateToken, async (req, res) => {
+  try {
+    const routine = await dbHelpers.createRoutine({
+      user_id: req.user.userId,
+      ...req.body
+    });
+    res.json({ success: true, routine });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/routines/complete-day', authenticateToken, async (req, res) => {
+  try {
+    const result = await dbHelpers.completeRoutineDay(req.user.userId);
+
+    if (result.alreadyCompleted) {
+      return res.json({
+        success: true,
+        alreadyCompleted: true,
+        message: 'Already completed today'
+      });
+    }
+
+    // Update streak
+    const streak = await dbHelpers.updateStreak(req.user.userId);
+
+    // Add points
+    const points = await dbHelpers.addPoints(req.user.userId, 'Completed daily routine', 10);
+
+    res.json({
+      success: true,
+      alreadyCompleted: false,
+      streak,
+      points: points.totalPoints
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Points
+app.get('/api/points', authenticateToken, async (req, res) => {
+  try {
+    const points = await dbHelpers.getPoints(req.user.userId);
+    res.json(points);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/points/add', authenticateToken, async (req, res) => {
+  try {
+    const { action, points } = req.body;
+    const result = await dbHelpers.addPoints(req.user.userId, action, points);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Streaks
+app.get('/api/streaks', authenticateToken, async (req, res) => {
+  try {
+    const streak = await dbHelpers.getStreak(req.user.userId);
+    res.json(streak);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Rewards
+app.get('/api/rewards', authenticateToken, async (req, res) => {
+  try {
+    const rewards = await dbHelpers.getAllRewards();
+    const userPoints = await dbHelpers.getPoints(req.user.userId);
+
+    res.json({
+      rewards,
+      userPoints: userPoints.totalPoints
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/rewards/redeem', authenticateToken, async (req, res) => {
+  try {
+    const { rewardId } = req.body;
+    const result = await dbHelpers.redeemReward(req.user.userId, rewardId);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Community Feed
+app.get('/api/community/feed', authenticateToken, async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const posts = await dbHelpers.getCommunityFeed(req.user.userId, limit);
+    res.json({ posts });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/community/posts', authenticateToken, async (req, res) => {
+  try {
+    const post = await dbHelpers.createCommunityPost({
+      user_id: req.user.userId,
+      ...req.body
+    });
+    res.json({ success: true, post });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/community/like/:postId', authenticateToken, async (req, res) => {
+  try {
+    const result = await dbHelpers.toggleCommunityLike(req.params.postId, req.user.userId);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
