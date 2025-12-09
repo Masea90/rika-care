@@ -241,7 +241,12 @@
             50% { transform: scale(1); opacity: 0.4; }
             100% { transform: scale(1.1); opacity: 0.1; }
         }
-        
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .face-outline {
             width: 160px;
             height: 200px;
@@ -684,18 +689,90 @@
             <button class="btn" onclick="startScan()">Start Analysis</button>
         </div>
 
+        <!-- Camera Modal -->
+        <div id="cameraModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; overflow: auto;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; position: relative;">
+                <!-- Close Button -->
+                <button onclick="closeCameraModal()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10000;">×</button>
+
+                <!-- Camera View -->
+                <div id="cameraView" style="text-align: center;">
+                    <h2 style="color: white; margin-bottom: 20px;">Position Your Face</h2>
+                    <div style="background: #FFF9F5; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="color: #6B5B73; font-size: 14px; margin: 0;">
+                            📸 Clean face • Natural lighting • Remove glasses
+                        </p>
+                    </div>
+
+                    <!-- Video Preview -->
+                    <div style="position: relative; max-width: 100%; margin: 0 auto;">
+                        <video id="cameraVideo" autoplay playsinline style="width: 100%; max-width: 400px; border-radius: 12px; transform: scaleX(-1);"></video>
+                        <canvas id="cameraCanvas" style="display: none;"></canvas>
+
+                        <!-- Face Outline Overlay -->
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 260px; border: 3px dashed #C4A484; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; opacity: 0.7; pointer-events: none;"></div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="cameraLoading" style="display: none; color: white; margin: 20px 0;">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(196,164,132,0.3); border-top-color: #C4A484; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 10px;">Accessing camera...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="cameraError" style="display: none; color: #ff6b6b; background: rgba(255,107,107,0.1); padding: 16px; border-radius: 8px; margin: 20px 0;">
+                        <p style="margin: 0; font-size: 14px;"></p>
+                    </div>
+
+                    <!-- Capture Button -->
+                    <button id="captureBtn" class="btn" onclick="captureImage()" style="margin-top: 20px; display: none; background: #C4A484;">
+                        📷 Capture Image
+                    </button>
+                </div>
+
+                <!-- Preview View (After Capture) -->
+                <div id="previewView" style="display: none; text-align: center;">
+                    <h2 style="color: white; margin-bottom: 20px;">Image Captured!</h2>
+                    <img id="capturedImage" style="max-width: 100%; border-radius: 12px; margin-bottom: 20px;" />
+
+                    <!-- Analysis Status -->
+                    <div id="analysisStatus" style="background: #FFF9F5; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <div id="analysisLoading" style="display: none;">
+                            <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(196,164,132,0.3); border-top-color: #C4A484; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <p style="color: #6B5B73; margin-top: 10px;">Analyzing your skin...</p>
+                        </div>
+                        <div id="analysisResult" style="display: none;">
+                            <p style="color: #6B5B73; font-size: 16px; margin: 0;">
+                                ✨ <strong>Analysis Complete!</strong><br>
+                                <span style="font-size: 14px;">AI skin analysis coming soon</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn-ghost btn" onclick="retakePhoto()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                            🔄 Retake
+                        </button>
+                        <button class="btn" onclick="finishCapture()" style="background: #C4A484;">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Skin Report -->
         <div class="screen" id="skinReport">
             <div class="header">
                 <div class="title">Your Skin Report</div>
             </div>
-            
+
             <div class="skin-report">
                 <div class="report-title">Analysis Complete</div>
                 <div style="font-size: 14px; color: #6B5B73; margin-bottom: 20px;">
                     Based on AI analysis of your skin
                 </div>
-                
+
                 <div class="skin-metrics">
                     <div class="metric">
                         <div class="metric-value">72%</div>
@@ -715,7 +792,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-title">Key Recommendations</div>
                 <div style="font-size: 14px; color: #6B5B73; line-height: 1.6;">
@@ -725,7 +802,7 @@
                     • SPF 30+ daily protection essential
                 </div>
             </div>
-            
+
             <button class="btn" onclick="showScreen('dashboard')">Go to Dashboard</button>
         </div>
 
@@ -2645,23 +2722,153 @@
             document.getElementById('continueQuiz').disabled = false;
         }
 
-        function startScan() {
-            // Simulate AI scanning
-            setTimeout(() => {
-                userProfile.scanData = {
-                    hydration: 72,
-                    oilZones: 'medium',
-                    redness: 'low',
-                    poreSize: 'fine'
+        // Camera variables
+        let cameraStream = null;
+        let capturedImageData = null;
+
+        async function startScan() {
+            // Open camera modal
+            document.getElementById('cameraModal').style.display = 'block';
+            document.getElementById('cameraView').style.display = 'block';
+            document.getElementById('previewView').style.display = 'none';
+            document.getElementById('cameraLoading').style.display = 'block';
+            document.getElementById('cameraError').style.display = 'none';
+            document.getElementById('captureBtn').style.display = 'none';
+
+            try {
+                // Request camera access
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user' // Front camera
+                    }
                 };
-                showScreen('skinReport');
-            }, 3000);
-            
-            // Show scanning animation
-            document.querySelector('.scan-interface').style.opacity = '0.5';
-            setTimeout(() => {
-                document.querySelector('.scan-interface').style.opacity = '1';
-            }, 3000);
+
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                // Attach stream to video element
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+
+                // Hide loading, show capture button
+                document.getElementById('cameraLoading').style.display = 'none';
+                document.getElementById('captureBtn').style.display = 'block';
+
+            } catch (error) {
+                console.error('Camera access error:', error);
+                document.getElementById('cameraLoading').style.display = 'none';
+
+                const errorDiv = document.getElementById('cameraError');
+                errorDiv.style.display = 'block';
+
+                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                    errorDiv.querySelector('p').textContent = '📷 Camera access denied. Please allow camera permissions in your browser settings.';
+                } else if (error.name === 'NotFoundError') {
+                    errorDiv.querySelector('p').textContent = '📷 No camera found on this device.';
+                } else {
+                    errorDiv.querySelector('p').textContent = '📷 Unable to access camera. Please try again.';
+                }
+            }
+        }
+
+        function captureImage() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const context = canvas.getContext('2d');
+
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw video frame to canvas (flip horizontally to match preview)
+            context.save();
+            context.scale(-1, 1);
+            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+            context.restore();
+
+            // Get image data as base64
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+
+            // Stop camera stream
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            // Show preview
+            document.getElementById('capturedImage').src = capturedImageData;
+            document.getElementById('cameraView').style.display = 'none';
+            document.getElementById('previewView').style.display = 'block';
+
+            // Send to backend for analysis
+            sendForAnalysis(capturedImageData);
+        }
+
+        async function sendForAnalysis(imageData) {
+            // Show loading
+            document.getElementById('analysisLoading').style.display = 'block';
+            document.getElementById('analysisResult').style.display = 'none';
+
+            try {
+                const response = await fetch(API_BASE + '/skin-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const data = await response.json();
+
+                // Simulate analysis delay
+                setTimeout(() => {
+                    document.getElementById('analysisLoading').style.display = 'none';
+                    document.getElementById('analysisResult').style.display = 'block';
+
+                    // Store analysis data
+                    if (data.success) {
+                        userProfile.scanData = data.analysis || {
+                            hydration: 72,
+                            oilZones: 'medium',
+                            redness: 'low',
+                            poreSize: 'fine'
+                        };
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('Analysis error:', error);
+                document.getElementById('analysisLoading').style.display = 'none';
+                document.getElementById('analysisResult').style.display = 'block';
+                document.getElementById('analysisResult').querySelector('p').innerHTML = '⚠️ <strong>Analysis paused</strong><br><span style="font-size: 14px;">AI features coming soon</span>';
+            }
+        }
+
+        function retakePhoto() {
+            capturedImageData = null;
+            startScan();
+        }
+
+        function finishCapture() {
+            closeCameraModal();
+            showScreen('skinReport');
+        }
+
+        function closeCameraModal() {
+            // Stop camera stream if active
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            // Hide modal
+            document.getElementById('cameraModal').style.display = 'none';
+
+            // Reset video
+            const video = document.getElementById('cameraVideo');
+            video.srcObject = null;
         }
 
         // Authentication Functions
