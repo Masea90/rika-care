@@ -1520,7 +1520,13 @@ function generateAIResponse(message, context, history) {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    version: '1.0.3-middleware-fix',
+    workingDir: process.cwd(),
+    dirname: __dirname
+  });
 });
 
 // Error handling middleware
