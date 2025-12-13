@@ -843,23 +843,28 @@
         <!-- Beauty Profile Setup -->
         <div class="screen" id="beautyProfile">
             <div class="header">
-                <div class="title">Complete Your Profile</div>
-                <div class="subtitle">Help us personalize your experience</div>
+                <div class="title" data-i18n="completeYourProfile">Complete Your Profile</div>
+                <div class="subtitle" data-i18n="helpUsPersonalize">Help us personalize your experience</div>
             </div>
-            
+
             <div class="card">
-                <div class="card-title">Tell us about yourself</div>
+                <div class="card-title" data-i18n="tellUsAboutYourself">Tell us about yourself</div>
                 <div style="background: #F9F6F3; padding: 16px; border-radius: 12px; margin: 16px 0;">
                     <div style="font-size: 12px; color: #6B5B73; margin-bottom: 8px;">
-                        <strong>Optional but Recommended</strong>
+                        <strong data-i18n="optionalButRecommended">Optional but Recommended</strong>
                     </div>
-                    <div style="font-size: 12px; color: #8B7D7D;">
+                    <div style="font-size: 12px; color: #8B7D7D;" data-i18n="thisHelpsProvide">
                         This helps us provide better recommendations and connect you with similar users.
                     </div>
                 </div>
-                
-                <button class="btn" onclick="showScreen('skinQuiz')">Continue to Skin Quiz</button>
-                <button class="btn-ghost btn" onclick="showScreen('dashboard')">Skip for Now</button>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn" onclick="showScreen('skinQuiz')" data-i18n="continueToSkinQuiz">Continue to Skin Quiz</button>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn-ghost btn" onclick="showScreen('privacyFirst')" data-i18n="back" style="flex: 1;">Back</button>
+                        <button class="btn-ghost btn" onclick="showScreen('dashboard')" data-i18n="skipForNow" style="flex: 1;">Skip for Now</button>
+                    </div>
+                </div>
             </div>
         </div>
 
