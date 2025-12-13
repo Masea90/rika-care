@@ -12,6 +12,7 @@ const { initDatabase, dbHelpers } = require('./database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const SERVER_VERSION = '2.0.0-path-detection'; // Force cache bust
 
 // Middleware
 app.use(cors({
@@ -1582,10 +1583,12 @@ app.use(express.static('.', {
 }));
 
 app.listen(PORT, () => {
-  console.log(`🚀 RIKA App Server running on port ${PORT}`);
+  console.log(`🚀 RIKA App Server v${SERVER_VERSION} running on port ${PORT}`);
   console.log(`📊 Analytics enabled`);
   console.log(`💰 Monetization services active`);
   console.log(`🔒 Security middleware loaded`);
+  console.log(`📁 Working directory: ${process.cwd()}`);
+  console.log(`📂 __dirname: ${__dirname}`);
 });
 
 module.exports = app;
