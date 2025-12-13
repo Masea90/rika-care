@@ -1,7 +1,7 @@
 // RIKA Care Service Worker
-// Version 1.0.1 - Force update to clear cached HTML
+// Version 1.0.2 - Force complete cache clear for back button updates
 
-const CACHE_NAME = 'rika-care-v1.0.1';
+const CACHE_NAME = 'rika-care-v1.0.2';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
