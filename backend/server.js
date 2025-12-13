@@ -1520,12 +1520,19 @@ function generateAIResponse(message, context, history) {
 
 // Health check
 app.get('/api/health', (req, res) => {
+  const fs = require('fs');
+  const files = fs.readdirSync(__dirname);
+  const hasRikaCare = files.includes('rika-care.html');
+
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     version: '1.0.3-middleware-fix',
     workingDir: process.cwd(),
-    dirname: __dirname
+    dirname: __dirname,
+    filesInDir: files.length,
+    hasRikaCareHtml: hasRikaCare,
+    rikaCareHtmlPath: path.join(__dirname, 'rika-care.html')
   });
 });
 
