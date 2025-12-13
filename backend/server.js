@@ -37,16 +37,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/uploads', express.static('uploads'));
-// Disable caching for static files to ensure updates are immediately visible
-app.use(express.static('.', {
-  etag: false,
-  lastModified: false,
-  setHeaders: (res, path) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-  }
-}));
 
 // Passport Google OAuth Configuration
 passport.use(new GoogleStrategy({
@@ -1538,6 +1528,18 @@ app.use((error, req, res, next) => {
   console.error(error);
   res.status(500).json({ error: 'Internal server error' });
 });
+
+// Serve static files LAST (after all routes) so routes take precedence
+// Disable caching to ensure updates are immediately visible
+app.use(express.static('.', {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 app.listen(PORT, () => {
   console.log(`🚀 RIKA App Server running on port ${PORT}`);
