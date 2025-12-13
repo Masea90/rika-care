@@ -1,0 +1,13 @@
+RIKA Care Deployment Verification
+Generated: 2025-12-13 19:20 UTC
+
+Latest commit: cef394d
+Expected features in this deployment:
+✅ Google OAuth Sign-In button
+✅ Back navigation buttons on all onboarding screens
+✅ PWA support with manifest and service worker
+✅ Translation fixes for all screens
+✅ No-cache headers on server
+
+If you're seeing this file on production, the deployment is working.
+If not, Render auto-deploy may be disabled.
