@@ -3,7 +3,7 @@ services:
     name: rika-care
     env: node
     buildCommand: cd backend && npm install
-    startCommand: cd backend && node server.js
+    startCommand: ./start.sh
     envVars:
       - key: NODE_ENV
         value: production
