@@ -631,60 +631,60 @@
         <div class="screen" id="privacyFirst">
             <div class="header">
                 <div class="logo">R</div>
-                <div class="title">Privacy First</div>
-                <div class="subtitle">Choose your visibility</div>
-                <div class="tagline">You can change this anytime in settings</div>
+                <div class="title" data-i18n="privacyFirst">Privacy First</div>
+                <div class="subtitle" data-i18n="chooseYourVisibility">Choose your visibility</div>
+                <div class="tagline" data-i18n="changeAnytime">You can change this anytime in settings</div>
             </div>
-            
+
             <div class="card">
-                <div class="card-title">Who can see your content?</div>
-                <div style="font-size: 14px; color: #6B5B73; margin-bottom: 20px;">
+                <div class="card-title" data-i18n="whoCanSeeContent">Who can see your content?</div>
+                <div style="font-size: 14px; color: #6B5B73; margin-bottom: 20px;" data-i18n="chooseWhoCanSee">
                     Choose who can see your content and interact with you.
                 </div>
-                
+
                 <div class="privacy-selector">
                     <div class="privacy-option selected" onclick="selectPrivacy(this, 'women')">
                         <div style="font-size: 16px; margin-bottom: 4px;">👩</div>
-                        <div>Women</div>
+                        <div data-i18n="women">Women</div>
                     </div>
                     <div class="privacy-option" onclick="selectPrivacy(this, 'men')">
                         <div style="font-size: 16px; margin-bottom: 4px;">👨</div>
-                        <div>Men</div>
+                        <div data-i18n="men">Men</div>
                     </div>
                     <div class="privacy-option" onclick="selectPrivacy(this, 'everyone')">
                         <div style="font-size: 16px; margin-bottom: 4px;">👥</div>
-                        <div>Everyone</div>
+                        <div data-i18n="everyone">Everyone</div>
                     </div>
                     <div class="privacy-option" onclick="selectPrivacy(this, 'private')">
                         <div style="font-size: 16px; margin-bottom: 4px;">🔒</div>
-                        <div>Only Me</div>
+                        <div data-i18n="onlyMe">Only Me</div>
                     </div>
                 </div>
-                
-                <button class="btn" onclick="saveVisibilityAndContinue()">Continue</button>
+
+                <button class="btn" onclick="saveVisibilityAndContinue()" data-i18n="continue">Continue</button>
             </div>
         </div>
 
         <!-- Skin Quiz -->
         <div class="screen" id="skinQuiz">
             <div class="header">
-                <div class="title">Know Your Skin</div>
-                <div class="subtitle">Quick assessment for personalized guidance</div>
+                <div class="title" data-i18n="knowYourSkin">Know Your Skin</div>
+                <div class="subtitle" data-i18n="quickAssessment">Quick assessment for personalized guidance</div>
             </div>
-            
+
             <div class="card">
-                <div class="card-title">What's your primary skin concern?</div>
+                <div class="card-title" data-i18n="whatPrimaryConcern">What's your primary skin concern?</div>
                 <div class="privacy-selector" style="grid-template-columns: 1fr;">
-                    <div class="privacy-option" onclick="selectConcern(this, 'dryness')">Dryness & Dehydration</div>
-                    <div class="privacy-option" onclick="selectConcern(this, 'acne')">Acne & Breakouts</div>
-                    <div class="privacy-option" onclick="selectConcern(this, 'aging')">Fine Lines & Aging</div>
-                    <div class="privacy-option" onclick="selectConcern(this, 'sensitivity')">Sensitivity & Redness</div>
-                    <div class="privacy-option" onclick="selectConcern(this, 'dullness')">Dullness & Uneven Tone</div>
+                    <div class="privacy-option" onclick="selectConcern(this, 'dryness')" data-i18n="drynessDehydration">Dryness & Dehydration</div>
+                    <div class="privacy-option" onclick="selectConcern(this, 'acne')" data-i18n="acneBreakouts">Acne & Breakouts</div>
+                    <div class="privacy-option" onclick="selectConcern(this, 'aging')" data-i18n="fineLinesAging">Fine Lines & Aging</div>
+                    <div class="privacy-option" onclick="selectConcern(this, 'sensitivity')" data-i18n="sensitivityRedness">Sensitivity & Redness</div>
+                    <div class="privacy-option" onclick="selectConcern(this, 'dullness')" data-i18n="dullnessUnevenTone">Dullness & Uneven Tone</div>
                 </div>
             </div>
-            
-            <button class="btn" onclick="showScreen('aiScan')" id="continueQuiz" disabled>Continue to AI Scan</button>
-            <button class="btn-ghost btn" onclick="showScreen('dashboard')">Skip Scan for Now</button>
+
+            <button class="btn" onclick="showScreen('aiScan')" id="continueQuiz" disabled data-i18n="continueToAIScan">Continue to AI Scan</button>
+            <button class="btn-ghost btn" onclick="showScreen('dashboard')" data-i18n="skipScanForNow">Skip Scan for Now</button>
         </div>
 
         <!-- AI Skin Scan -->
