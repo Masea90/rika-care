@@ -144,21 +144,43 @@ app.get('/rika-care.html', (req, res) => {
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
 
-  // Use process.cwd() since Render's rootDir sets working directory correctly
-  const htmlPath = path.join(process.cwd(), 'rika-care.html');
-  console.log('Attempting to serve rika-care.html');
-  console.log('Working directory:', process.cwd());
-  console.log('__dirname:', __dirname);
-  console.log('Full path:', htmlPath);
+  // Try multiple possible paths for rika-care.html
+  const fs = require('fs');
+  const possiblePaths = [
+    path.join(__dirname, 'rika-care.html'),           // Same directory as server.js
+    path.join(process.cwd(), 'rika-care.html'),      // Current working directory
+    path.join(__dirname, '..', 'backend', 'rika-care.html'), // Parent/backend
+    path.join(process.cwd(), 'backend', 'rika-care.html')    // cwd/backend
+  ];
+
+  let htmlPath = null;
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      htmlPath = testPath;
+      console.log(`✅ Found rika-care.html at: ${htmlPath}`);
+      break;
+    }
+  }
+
+  if (!htmlPath) {
+    console.error('❌ Could not find rika-care.html in any of these locations:');
+    possiblePaths.forEach(p => console.error(`  - ${p}`));
+    return res.status(500).send(`
+      <h1>RIKA Care - File Not Found</h1>
+      <p>Working directory: ${process.cwd()}</p>
+      <p>__dirname: ${__dirname}</p>
+      <p>Searched paths:</p>
+      <ul>${possiblePaths.map(p => `<li>${p}</li>`).join('')}</ul>
+    `);
+  }
 
   res.sendFile(htmlPath, (err) => {
     if (err) {
       console.error('Error serving rika-care.html:', err);
       res.status(500).send(`
         <h1>RIKA Care - Error</h1>
-        <p>Could not load application. File path: ${htmlPath}</p>
-        <p>Working directory: ${process.cwd()}</p>
-        <p>__dirname: ${__dirname}</p>
+        <p>File found at: ${htmlPath}</p>
+        <p>But failed to send: ${err.message}</p>
       `);
     }
   });
