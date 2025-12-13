@@ -144,8 +144,12 @@ app.get('/rika-care.html', (req, res) => {
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
 
-  const htmlPath = path.join(__dirname, 'rika-care.html');
-  console.log('Serving HTML from:', htmlPath);
+  // Use process.cwd() since Render's rootDir sets working directory correctly
+  const htmlPath = path.join(process.cwd(), 'rika-care.html');
+  console.log('Attempting to serve rika-care.html');
+  console.log('Working directory:', process.cwd());
+  console.log('__dirname:', __dirname);
+  console.log('Full path:', htmlPath);
 
   res.sendFile(htmlPath, (err) => {
     if (err) {
