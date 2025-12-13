@@ -661,7 +661,10 @@
                     </div>
                 </div>
 
-                <button class="btn" onclick="saveVisibilityAndContinue()" data-i18n="continue">Continue</button>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <button class="btn-ghost btn" onclick="goBackToAuth()" data-i18n="back" style="flex: 1;">Back</button>
+                    <button class="btn" onclick="saveVisibilityAndContinue()" data-i18n="continue" style="flex: 2;">Continue</button>
+                </div>
             </div>
         </div>
 
@@ -683,8 +686,13 @@
                 </div>
             </div>
 
-            <button class="btn" onclick="showScreen('aiScan')" id="continueQuiz" disabled data-i18n="continueToAIScan">Continue to AI Scan</button>
-            <button class="btn-ghost btn" onclick="showScreen('dashboard')" data-i18n="skipScanForNow">Skip Scan for Now</button>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 0 24px;">
+                <button class="btn" onclick="showScreen('aiScan')" id="continueQuiz" disabled data-i18n="continueToAIScan">Continue to AI Scan</button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-ghost btn" onclick="showScreen('privacyFirst')" data-i18n="back" style="flex: 1;">Back</button>
+                    <button class="btn-ghost btn" onclick="showScreen('dashboard')" data-i18n="skipScanForNow" style="flex: 1;">Skip Scan for Now</button>
+                </div>
+            </div>
         </div>
 
         <!-- AI Skin Scan -->
@@ -3056,7 +3064,12 @@
         window.addEventListener('DOMContentLoaded', () => {
             handleOAuthCallback();
         });
-        
+
+        // Navigation: Go back to login/signup
+        function goBackToAuth() {
+            showScreen('login');
+        }
+
         async function saveVisibilityAndContinue() {
             const selectedOption = document.querySelector('.privacy-option.selected');
             if (!selectedOption) {
@@ -3356,6 +3369,7 @@
                 everyone: 'Everyone',
                 onlyMe: 'Only Me',
                 continue: 'Continue',
+                back: 'Back',
                 // Beauty Profile
                 completeYourProfile: 'Complete Your Profile',
                 helpUsPersonalize: 'Help us personalize your experience',
@@ -3430,6 +3444,7 @@
                 everyone: 'Todos',
                 onlyMe: 'Solo Yo',
                 continue: 'Continuar',
+                back: 'Atrás',
                 // Beauty Profile
                 completeYourProfile: 'Completa Tu Perfil',
                 helpUsPersonalize: 'Ayúdanos a personalizar tu experiencia',
@@ -3504,6 +3519,7 @@
                 everyone: 'Tout le Monde',
                 onlyMe: 'Seulement Moi',
                 continue: 'Continuer',
+                back: 'Retour',
                 // Beauty Profile
                 completeYourProfile: 'Complétez Votre Profil',
                 helpUsPersonalize: 'Aidez-nous à personnaliser votre expérience',
