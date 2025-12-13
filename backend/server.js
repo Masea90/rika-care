@@ -147,10 +147,11 @@ app.get('/rika-care.html', (req, res) => {
   // Try multiple possible paths for rika-care.html
   const fs = require('fs');
   const possiblePaths = [
-    path.join(__dirname, 'rika-care.html'),           // Same directory as server.js
-    path.join(process.cwd(), 'rika-care.html'),      // Current working directory
-    path.join(__dirname, '..', 'backend', 'rika-care.html'), // Parent/backend
-    path.join(process.cwd(), 'backend', 'rika-care.html')    // cwd/backend
+    path.join(__dirname, 'rika-care.html'),                    // Same directory as server.js (SHOULD WORK)
+    path.join(process.cwd(), 'rika-care.html'),               // Current working directory
+    path.join(process.cwd(), 'src', 'backend', 'rika-care.html'), // Render structure
+    path.join(__dirname, '..', 'backend', 'rika-care.html'),  // Parent/backend
+    path.join(process.cwd(), 'backend', 'rika-care.html')     // cwd/backend
   ];
 
   let htmlPath = null;
