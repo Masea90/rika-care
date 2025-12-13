@@ -37,7 +37,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/uploads', express.static('uploads'));
-app.use(express.static('.'));
+// Disable caching for static files to ensure updates are immediately visible
+app.use(express.static('.', {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 // Passport Google OAuth Configuration
 passport.use(new GoogleStrategy({
