@@ -155,23 +155,24 @@ app.get('/rika-care.html', (req, res) => {
   res.setHeader('Expires', '0');
 
   const htmlPath = path.join(__dirname, 'rika-care.html');
-  res.sendFile(htmlPath);
-});
-
-// Serve main HTML file at root
-app.get('/', (req, res) => {
-  const htmlPath = path.join(__dirname, 'index.html');
+  console.log('Serving HTML from:', htmlPath);
 
   res.sendFile(htmlPath, (err) => {
     if (err) {
-      console.error('Error serving HTML file:', err);
+      console.error('Error serving rika-care.html:', err);
       res.status(500).send(`
-        <h1>RIKA Care</h1>
-        <p>✅ Backend is running! Please add index.html to the repository.</p>
-        <p>API Status: Ready</p>
+        <h1>RIKA Care - Error</h1>
+        <p>Could not load application. File path: ${htmlPath}</p>
+        <p>Working directory: ${process.cwd()}</p>
+        <p>__dirname: ${__dirname}</p>
       `);
     }
   });
+});
+
+// Serve main HTML file at root - redirect to rika-care.html
+app.get('/', (req, res) => {
+  res.redirect('/rika-care.html');
 });
 
 // Authentication
