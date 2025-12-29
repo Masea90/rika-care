@@ -1235,18 +1235,18 @@ app.post('/api/rewards/redeem', authenticateToken, async (req, res) => {
 // Chat endpoint
 app.post('/api/chat', authenticateToken, async (req, res) => {
   try {
-    const { message, history = [] } = req.body;
-    
+    const { message, history = [], language = 'en' } = req.body;
+
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'Message is required' });
     }
-    
+
     // Build user context
     const userContext = await buildUserContext(req.user.userId);
-    
-    // Generate AI response
-    const response = generateAIResponse(message, userContext, history);
-    
+
+    // Generate AI response with language support
+    const response = generateAIResponse(message, userContext, history, language);
+
     res.json(response);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1411,24 +1411,38 @@ async function getCommunityStats(skinType, hairType) {
 }
 
 // Generate AI response using rule-based logic
-function generateAIResponse(message, context, history) {
+function generateAIResponse(message, context, history, language = 'en') {
   const msg = message.toLowerCase();
   const user = context.user || {};
   const recommendations = context.recommendations || [];
   const points = context.points || {};
   const community = context.community || {};
-  
+
+  // Language-specific responses
+  const translations = {
+    en: {
+      greeting: (name, skinType) => `Hi ${name}! I'm your RIKA Care AI assistant. I'm here to help with your skincare and haircare journey. ${skinType ? `I see you have ${skinType} skin. ` : ''}What would you like to know about today?`,
+      suggestProducts: ['What products do you recommend for me?', 'How is my routine going?', 'Tell me about my skin type']
+    },
+    es: {
+      greeting: (name, skinType) => `¡Hola ${name}! Soy tu asistente de IA de RIKA Care. Estoy aquí para ayudarte con tu rutina de cuidado de la piel y el cabello. ${skinType ? `Veo que tienes piel ${skinType}. ` : ''}¿Qué te gustaría saber hoy?`,
+      suggestProducts: ['¿Qué productos me recomiendas?', '¿Cómo va mi rutina?', 'Cuéntame sobre mi tipo de piel']
+    },
+    fr: {
+      greeting: (name, skinType) => `Salut ${name}! Je suis votre assistant IA RIKA Care. Je suis là pour vous aider dans votre routine de soins de la peau et des cheveux. ${skinType ? `Je vois que vous avez la peau ${skinType}. ` : ''}Que voulez-vous savoir aujourd'hui?`,
+      suggestProducts: ['Quels produits me recommandez-vous?', 'Comment va ma routine?', 'Parlez-moi de mon type de peau']
+    }
+  };
+
+  const lang = translations[language] || translations['en'];
+
   let reply = '';
   let suggestedFollowUps = [];
-  
+
   // Greeting patterns
-  if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-    reply = `Hi ${user.name}! I'm your RIKA Care AI assistant. I'm here to help with your skincare and haircare journey. `;
-    if (user.skinType) {
-      reply += `I see you have ${user.skinType} skin. `;
-    }
-    reply += `What would you like to know about today?`;
-    suggestedFollowUps = ['What products do you recommend for me?', 'How is my routine going?', 'Tell me about my skin type'];
+  if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('hola') || msg.includes('salut')) {
+    reply = lang.greeting(user.name, user.skinType);
+    suggestedFollowUps = lang.suggestProducts;
   }
   
   // Product recommendation requests

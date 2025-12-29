@@ -2624,13 +2624,14 @@
             showTypingIndicator();
             
             try {
+                const userLanguage = localStorage.getItem('rika-language') || 'en';
                 const response = await fetch(`${API_BASE}/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({ message, history: chatHistory })
+                    body: JSON.stringify({ message, history: chatHistory, language: userLanguage })
                 });
                 
                 if (response.ok) {
