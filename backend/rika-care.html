@@ -537,6 +537,17 @@
             margin-bottom: 16px;
         }
         
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
         .hidden { display: none !important; }
         .error { background: #FFF5F5; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
         .success { background: #F0FDF4; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
@@ -866,69 +877,91 @@
 
         <!-- Dashboard -->
         <div class="screen" id="dashboard">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding: 16px 0;">
-                <div class="logo" style="width: 32px; height: 32px; font-size: 16px; margin: 0; color: #B8A082; opacity: 0.7;">RC</div>
-                <div style="text-align: center; flex: 1;">
-                    <div class="title" style="font-size: 24px; margin-bottom: 4px;" id="personalGreeting">Good evening, User 🌿</div>
-                    <div style="font-size: 13px; color: #A69B9B; font-weight: 200; letter-spacing: 0.3px;">Your natural beauty dashboard</div>
+            <!-- Simplified Header -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 12px 0;">
+                <div style="text-align: left; flex: 1;">
+                    <div class="title" style="font-size: 22px; margin-bottom: 2px;" id="personalGreeting">Good evening, User 🌿</div>
+                    <div style="font-size: 12px; color: #A69B9B; font-weight: 300;">Level 1 • Day <span id="userDayCount">1</span></div>
                 </div>
-                <div id="pointsBadge" style="background: linear-gradient(135deg, #E8DDD4, #D4C4B0); color: #6B5B73; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="openRewardsStore()">⭐ 0 points</div>
+                <div id="pointsBadge" style="background: linear-gradient(135deg, #E8DDD4, #D4C4B0); color: #6B5B73; padding: 6px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; cursor: pointer;" onclick="openRewardsStore()">⭐ 0</div>
             </div>
             
-            <!-- Natural Glow Score -->
-            <div class="card" style="background: linear-gradient(135deg, #F9F6F3, #F5F2EF); box-shadow: 0 1px 8px rgba(0,0,0,0.02); margin-bottom: 20px; text-align: center;">
-                <div class="card-title" style="color: #6B5B73; margin-bottom: 16px;">🌟 Your Natural Glow Score</div>
-                <div style="font-size: 32px; font-weight: 300; color: #C4A484; margin-bottom: 8px;">87/100</div>
-                <div style="font-size: 13px; color: #8B7D7D; margin-bottom: 16px;">This week's wellness journey</div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #A69B9B;">
-                    <div>Skin: 92%</div>
-                    <div>Hair: 85%</div>
-                    <div>Nutrition: 84%</div>
+            <!-- Daily Challenge Card -->
+            <div class="card" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); margin-bottom: 16px; text-align: center; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -5px; right: -5px; font-size: 40px; opacity: 0.2;">🎯</div>
+                <div style="font-size: 16px; font-weight: 500; color: #92400E; margin-bottom: 8px;">Today's Challenge</div>
+                <div id="dailyChallenge" style="font-size: 14px; color: #B45309; margin-bottom: 12px;">Complete your morning routine</div>
+                <button id="challengeBtn" onclick="completeDailyChallenge()" class="btn" style="background: linear-gradient(135deg, #F59E0B, #D97706); font-size: 13px; padding: 8px 16px; width: auto;">Start Challenge</button>
+            </div>
+            
+            <!-- Weekly Progress -->
+            <div class="card" style="background: linear-gradient(135deg, #F9F6F3, #F5F2EF); margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 14px; font-weight: 500; color: #6B5B73;">This Week</div>
+                    <div style="font-size: 20px; font-weight: 400; color: #C4A484;" id="weeklyScore">87%</div>
+                </div>
+                <div style="background: #F5F0EB; height: 6px; border-radius: 3px; overflow: hidden;">
+                    <div style="background: linear-gradient(90deg, #C4A484, #D4A574); height: 100%; width: 87%; border-radius: 3px; transition: width 0.8s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #8B7D7D;">
+                    <div>🌸 Skin: 92%</div>
+                    <div>🌿 Hair: 85%</div>
+                    <div>🥑 Nutrition: 84%</div>
                 </div>
             </div>
             
-            <!-- Streak Component -->
-            <div class="card" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); box-shadow: 0 1px 8px rgba(0,0,0,0.02); margin-bottom: 16px; text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
-                    <div style="font-size: 24px;">🔥</div>
-                    <div>
-                        <div id="streakDisplay" style="font-size: 18px; font-weight: 500; color: #92400E;">Start your streak today ✨</div>
-                        <div id="streakBest" style="font-size: 12px; color: #B45309; margin-top: 2px;"></div>
+            <!-- Quick Actions -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <button onclick="showTab('routine')" class="btn" style="background: linear-gradient(135deg, #C4A484, #B8A082); font-size: 13px; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 18px;">✨</span>
+                    <span>Start Routine</span>
+                </button>
+                <button onclick="quickSkinCheck()" class="btn" style="background: linear-gradient(135deg, #10B981, #059669); font-size: 13px; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-size: 18px;">📸</span>
+                    <span>Skin Check</span>
+                </button>
+            </div>
+            
+            <!-- Streak & Progress -->
+            <div class="card" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="font-size: 20px;">🔥</div>
+                        <div>
+                            <div id="streakDisplay" style="font-size: 16px; font-weight: 500; color: #92400E;">0 day streak</div>
+                            <div id="streakBest" style="font-size: 11px; color: #B45309;">Best: 0 days</div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; font-weight: 500; color: #92400E;" id="todayProgress">0/3</div>
+                        <div style="font-size: 10px; color: #B45309;">completed</div>
                     </div>
                 </div>
-                <button id="completeRoutineBtn" onclick="completeRoutineDay()" class="btn" style="background: linear-gradient(135deg, #F59E0B, #D97706); font-size: 14px; padding: 10px 16px; margin-top: 8px;">Complete Today's Routine</button>
             </div>
             
-            <!-- Your Skin Today -->
-            <div class="card" style="box-shadow: 0 1px 8px rgba(0,0,0,0.02); margin-bottom: 16px;">
-                <div class="card-title" style="margin-bottom: 16px;">🌸 Your Skin Today</div>
-                <div style="font-size: 14px; color: #6B5B73; margin-bottom: 8px; line-height: 1.5;">
-                    Hydration levels look good. Consider a gentle exfoliant this week.
-                </div>
-                <div class="skin-mood">
-                    Skin mood: Balanced 😊
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 12px; color: #8B7D7D;">
-                    <div>Hydration: 78%</div>
-                    <div>Oil zones: T-zone</div>
-                    <div>Sensitivity: Low</div>
-                </div>
+            <!-- Daily Tip Card -->
+            <div class="card" style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7); margin-bottom: 16px; position: relative;">
+                <div style="position: absolute; top: -5px; right: -5px; font-size: 30px; opacity: 0.3;">💡</div>
+                <div style="font-size: 13px; font-weight: 500; color: #166534; margin-bottom: 6px;">Daily Beauty Tip</div>
+                <div id="dailyTip" style="font-size: 13px; color: #15803D; line-height: 1.4;">Massage your face for 30 seconds while cleansing to boost circulation and glow!</div>
             </div>
             
-            <!-- Your Hair Today -->
-            <div class="card" style="box-shadow: 0 1px 8px rgba(0,0,0,0.02); margin-bottom: 16px;">
-                <div class="card-title" style="margin-bottom: 16px;">🌿 Your Hair Today</div>
-                <div style="font-size: 14px; color: #6B5B73; margin-bottom: 8px; line-height: 1.5;">
-                    Scalp looks healthy. Try rosemary oil for extra shine this week.
+            <!-- Weather-Based Recommendation -->
+            <div class="card" style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span id="weatherIcon" style="font-size: 16px;">☁️</span>
+                    <div style="font-size: 13px; font-weight: 500; color: #1E40AF;">Today's Weather Tip</div>
                 </div>
-                <div class="skin-mood">
-                    Hair mood: Strong & happy 💪
+                <div id="weatherTip" style="font-size: 12px; color: #1D4ED8; line-height: 1.4;">It's humid today - use a lightweight moisturizer and setting spray!</div>
+            </div>
+            
+            <!-- Achievement Notification -->
+            <div id="achievementCard" class="card" style="background: linear-gradient(135deg, #FDF4FF, #FAE8FF); margin-bottom: 16px; display: none;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="font-size: 20px;">🏆</span>
+                    <div style="font-size: 14px; font-weight: 500; color: #7C2D92;">Achievement Unlocked!</div>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 12px; font-size: 12px; color: #8B7D7D;">
-                    <div>Scalp: Balanced</div>
-                    <div>Frizz risk: Low</div>
-                    <div>Damage: Minimal</div>
-                </div>
+                <div id="achievementText" style="font-size: 12px; color: #86198F; line-height: 1.4;">First routine completed! You're on your way to glowing skin.</div>
             </div>
             
             <!-- Beauty Nutrition -->
@@ -1187,51 +1220,76 @@
         <div class="screen" id="routine">
             <div class="header">
                 <div class="title">Your Routine</div>
-                <div class="subtitle">Personalized for your skin</div>
+                <div class="subtitle">Let's make it happen!</div>
             </div>
             
-            <div class="progress-ring">
-                <div class="progress-inner">
-                    <div class="progress-text">2/4</div>
-                    <div class="progress-label">Today</div>
+            <!-- Timer Card -->
+            <div class="card" style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7); text-align: center; margin-bottom: 16px;">
+                <div style="font-size: 32px; font-weight: 300; color: #166534; margin-bottom: 8px;" id="routineTimer">2:00</div>
+                <div style="font-size: 12px; color: #15803D; margin-bottom: 12px;">Recommended time per step</div>
+                <button id="timerBtn" onclick="startRoutineTimer()" class="btn" style="background: linear-gradient(135deg, #10B981, #059669); font-size: 13px; padding: 8px 16px; width: auto;">Start Timer</button>
+            </div>
+            
+            <!-- Progress Overview -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px; background: #F9F6F3; border-radius: 12px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 500; color: #C4A484;" id="routineProgress">0/4</div>
+                    <div style="font-size: 10px; color: #8B7D7D;">Steps</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 500; color: #10B981;" id="routineTime">0m</div>
+                    <div style="font-size: 10px; color: #8B7D7D;">Time</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 500; color: #F59E0B;" id="routinePoints">+0</div>
+                    <div style="font-size: 10px; color: #8B7D7D;">Points</div>
                 </div>
             </div>
             
             <div class="card">
                 <div class="card-title">Morning Routine</div>
                 
-                <div class="routine-item completed" onclick="toggleRoutine(this)">
-                    <div class="checkbox checked">✓</div>
+                <div class="routine-item" onclick="toggleRoutineStep(this, 'cleanser', 2)" data-step="cleanser">
+                    <div class="checkbox"></div>
                     <div style="flex: 1;">
                         <div style="font-size: 14px; font-weight: 400;">Gentle Cleanser</div>
-                        <div style="font-size: 12px; color: #8B7D7D;">CeraVe Hydrating</div>
+                        <div style="font-size: 12px; color: #8B7D7D;">2 min • +10 points</div>
                     </div>
+                    <div style="font-size: 16px; opacity: 0.5;">🧤</div>
                 </div>
                 
-                <div class="routine-item completed" onclick="toggleRoutine(this)">
-                    <div class="checkbox checked">✓</div>
+                <div class="routine-item" onclick="toggleRoutineStep(this, 'serum', 1)" data-step="serum">
+                    <div class="checkbox"></div>
                     <div style="flex: 1;">
                         <div style="font-size: 14px; font-weight: 400;">Hydrating Serum</div>
-                        <div style="font-size: 12px; color: #8B7D7D;">The Ordinary Hyaluronic</div>
+                        <div style="font-size: 12px; color: #8B7D7D;">1 min • +10 points</div>
                     </div>
+                    <div style="font-size: 16px; opacity: 0.5;">💧</div>
                 </div>
                 
-                <div class="routine-item" onclick="toggleRoutine(this)">
+                <div class="routine-item" onclick="toggleRoutineStep(this, 'moisturizer', 1)" data-step="moisturizer">
                     <div class="checkbox"></div>
                     <div style="flex: 1;">
                         <div style="font-size: 14px; font-weight: 400;">Moisturizer</div>
-                        <div style="font-size: 12px; color: #8B7D7D;">Neutrogena Hydro Boost</div>
+                        <div style="font-size: 12px; color: #8B7D7D;">1 min • +10 points</div>
                     </div>
+                    <div style="font-size: 16px; opacity: 0.5;">✨</div>
                 </div>
                 
-                <div class="routine-item" onclick="toggleRoutine(this)">
+                <div class="routine-item" onclick="toggleRoutineStep(this, 'spf', 1)" data-step="spf">
                     <div class="checkbox"></div>
                     <div style="flex: 1;">
                         <div style="font-size: 14px; font-weight: 400;">SPF Protection</div>
-                        <div style="font-size: 12px; color: #8B7D7D;">EltaMD UV Clear</div>
+                        <div style="font-size: 12px; color: #8B7D7D;">1 min • +15 points</div>
                     </div>
+                    <div style="font-size: 16px; opacity: 0.5;">☀️</div>
                 </div>
             </div>
+            
+            <!-- Complete Button -->
+            <button id="completeAllBtn" onclick="completeAllRoutine()" class="btn" style="background: linear-gradient(135deg, #10B981, #059669); margin-top: 16px; font-size: 15px; padding: 16px; display: none;">
+                🎉 Complete Routine (+45 points)
+            </button>
         </div>
 
         <!-- Community -->
@@ -1471,8 +1529,24 @@
         let userRoutines = [];
         let recommendedProducts = [];
 
-        // Check if user is already logged in
-        if (authToken) {
+        // DEV MODE: Skip auth for testing
+        const isDev = window.location.hostname === 'localhost' || window.location.search.includes('dev=true');
+        if (isDev && !authToken) {
+            // Create mock user for testing
+            authToken = 'dev-token';
+            currentUser = {
+                email: 'dev@test.com',
+                profile: {
+                    personalInfo: { name: 'Dev User' },
+                    community: { profileVisibility: 'everyone' },
+                    preferences: { language: 'en' }
+                }
+            };
+            showScreen('dashboard');
+            initializeDashboard();
+            console.log('🚀 DEV MODE: Bypassed auth');
+        } else if (authToken) {
+            // Check if user is already logged in
             loadUserProfile().then(() => {
                 // Check if user needs onboarding
                 if (needsPrivacyOnboarding()) {
@@ -1942,9 +2016,439 @@
             closeProductDetail();
         }
         
-        // Points & Rewards System
+        // Enhanced Dashboard Functions
+        let dailyTips = [
+            "Massage your face for 30 seconds while cleansing to boost circulation!",
+            "Apply sunscreen 15 minutes before going outside for best protection.",
+            "Drink a glass of water first thing in the morning for glowing skin.",
+            "Use a silk pillowcase to reduce hair breakage and skin irritation.",
+            "Pat your face dry instead of rubbing to prevent micro-tears.",
+            "Apply moisturizer to damp skin to lock in extra hydration.",
+            "Do facial exercises for 5 minutes to tone your face muscles."
+        ];
+        
+        let dailyChallenges = [
+            "Complete your morning routine",
+            "Take a progress selfie",
+            "Drink 8 glasses of water",
+            "Try a 2-minute face massage",
+            "Apply SPF before going outside",
+            "Do 10 facial exercises",
+            "Share a beauty tip with the community"
+        ];
+        
+        let weatherTips = {
+            sunny: "It's sunny - don't forget SPF 30+ and reapply every 2 hours!",
+            cloudy: "Cloudy weather still needs SPF - UV rays penetrate clouds!",
+            humid: "High humidity today - use lightweight, gel-based products!",
+            dry: "Dry air today - boost your hydration with a humidifier and extra moisturizer!",
+            cold: "Cold weather - protect your skin barrier with richer creams!"
+        };
+        
+        let routineTimer = null;
+        let currentStep = null;
+        let routineStartTime = null;
+        let completedSteps = [];
+        let totalRoutinePoints = 0;
+        
+        // Initialize mock data for dev mode
         let userPoints = 0;
         let userStreak = { currentStreak: 0, longestStreak: 0, lastActivityDate: null };
+        
+        function initializeDashboard() {
+            updateDailyContent();
+            updateUserLevel();
+            loadUserProgress();
+            
+            // Initialize dev mode data
+            if (authToken === 'dev-token') {
+                userPoints = parseInt(localStorage.getItem('dev-points') || '0');
+                updatePointsDisplay();
+                
+                const savedStreak = localStorage.getItem('dev-streak');
+                if (savedStreak) {
+                    userStreak = JSON.parse(savedStreak);
+                } else {
+                    userStreak = { currentStreak: 0, longestStreak: 0, lastActivityDate: null };
+                }
+                updateStreakDisplay();
+            }
+        }
+        
+        function updateDailyContent() {
+            // Update daily tip
+            const today = new Date().getDate();
+            const tipIndex = today % dailyTips.length;
+            document.getElementById('dailyTip').textContent = dailyTips[tipIndex];
+            
+            // Update daily challenge
+            const challengeIndex = today % dailyChallenges.length;
+            document.getElementById('dailyChallenge').textContent = dailyChallenges[challengeIndex];
+            
+            // Update weather tip (simulate weather)
+            const weatherTypes = Object.keys(weatherTips);
+            const weatherIndex = today % weatherTypes.length;
+            const weather = weatherTypes[weatherIndex];
+            
+            const weatherIcons = {
+                sunny: '☀️',
+                cloudy: '☁️',
+                humid: '💧',
+                dry: '🌵',
+                cold: '❄️'
+            };
+            
+            document.getElementById('weatherIcon').textContent = weatherIcons[weather];
+            document.getElementById('weatherTip').textContent = weatherTips[weather];
+        }
+        
+        function updateUserLevel() {
+            const dayCount = parseInt(localStorage.getItem('userDayCount') || '1');
+            document.getElementById('userDayCount').textContent = dayCount;
+        }
+        
+        function completeDailyChallenge() {
+            const btn = document.getElementById('challengeBtn');
+            btn.textContent = '✓ Completed!';
+            btn.style.background = '#10B981';
+            btn.disabled = true;
+            
+            // Award points
+            addPoints('Daily challenge completed', 25);
+            
+            // Show achievement
+            showAchievement('Challenge Master!', 'Daily challenge completed. Keep it up!');
+            
+            // Save completion
+            const today = new Date().toDateString();
+            localStorage.setItem('lastChallengeDate', today);
+        }
+        
+        function quickSkinCheck() {
+            // Simple skin check without camera
+            const checkResults = [
+                'Your skin looks hydrated today! 💧',
+                'Great glow! Your routine is working! ✨',
+                'Skin looks balanced and healthy! 😊',
+                'Beautiful natural radiance! 🌟',
+                'Your skin barrier looks strong! 🛡️'
+            ];
+            
+            const randomResult = checkResults[Math.floor(Math.random() * checkResults.length)];
+            
+            // Show result in a nice popup
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+                border: 1px solid #BBF7D0; color: #166534;
+                padding: 24px; border-radius: 16px; text-align: center;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 2000;
+                max-width: 280px; animation: slideIn 0.3s ease;
+            `;
+            popup.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 12px;">📸</div>
+                <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 500;">Skin Check Complete!</h3>
+                <p style="margin: 0; font-size: 14px;">${randomResult}</p>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 3000);
+            
+            // Award points
+            addPoints('Daily skin check', 15);
+        }
+        
+        function showAchievement(title, description) {
+            const card = document.getElementById('achievementCard');
+            document.getElementById('achievementText').textContent = description;
+            card.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                card.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Enhanced Routine Functions
+        function startRoutineTimer() {
+            const btn = document.getElementById('timerBtn');
+            const timerDisplay = document.getElementById('routineTimer');
+            
+            if (routineTimer) {
+                clearInterval(routineTimer);
+                routineTimer = null;
+                btn.textContent = 'Start Timer';
+                return;
+            }
+            
+            let seconds = 120; // 2 minutes
+            btn.textContent = 'Stop Timer';
+            routineStartTime = Date.now();
+            
+            routineTimer = setInterval(() => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                if (seconds <= 0) {
+                    clearInterval(routineTimer);
+                    routineTimer = null;
+                    btn.textContent = 'Start Timer';
+                    
+                    // Show completion notification
+                    showTimerComplete();
+                }
+                
+                seconds--;
+            }, 1000);
+        }
+        
+        function showTimerComplete() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px;
+                background: linear-gradient(135deg, #10B981, #059669);
+                color: white; padding: 12px 16px; border-radius: 8px;
+                font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = '⏰ Time\'s up! Great job on your routine step!';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        function toggleRoutineStep(element, stepName, minutes) {
+            const checkbox = element.querySelector('.checkbox');
+            const isCompleted = element.classList.contains('completed');
+            
+            if (isCompleted) {
+                // Uncomplete step
+                element.classList.remove('completed');
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+                
+                // Remove from completed steps
+                completedSteps = completedSteps.filter(step => step !== stepName);
+                totalRoutinePoints -= getStepPoints(stepName);
+            } else {
+                // Complete step
+                element.classList.add('completed');
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+                
+                // Add to completed steps
+                completedSteps.push(stepName);
+                const points = getStepPoints(stepName);
+                totalRoutinePoints += points;
+                
+                // Show step completion animation
+                showStepComplete(stepName, points);
+                
+                // Award points immediately
+                addPoints(`Completed ${stepName}`, points);
+            }
+            
+            updateRoutineProgress();
+            
+            // Check if all steps completed
+            if (completedSteps.length === 4) {
+                document.getElementById('completeAllBtn').style.display = 'block';
+            } else {
+                document.getElementById('completeAllBtn').style.display = 'none';
+            }
+        }
+        
+        function getStepPoints(stepName) {
+            const pointMap = {
+                'cleanser': 10,
+                'serum': 10,
+                'moisturizer': 10,
+                'spf': 15
+            };
+            return pointMap[stepName] || 10;
+        }
+        
+        function showStepComplete(stepName, points) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px;
+                background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+                color: #92400E; padding: 12px 16px; border-radius: 8px;
+                font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = `✨ ${stepName} complete! +${points} points`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+        
+        function updateRoutineProgress() {
+            const progress = document.getElementById('routineProgress');
+            const timeEl = document.getElementById('routineTime');
+            const pointsEl = document.getElementById('routinePoints');
+            
+            progress.textContent = `${completedSteps.length}/4`;
+            
+            if (routineStartTime) {
+                const elapsed = Math.floor((Date.now() - routineStartTime) / 60000);
+                timeEl.textContent = `${elapsed}m`;
+            }
+            
+            pointsEl.textContent = `+${totalRoutinePoints}`;
+            
+            // Update dashboard progress
+            const todayProgress = document.getElementById('todayProgress');
+            if (todayProgress) {
+                todayProgress.textContent = `${completedSteps.length}/3`;
+            }
+        }
+        
+        function completeAllRoutine() {
+            // Show celebration
+            showRoutineComplete();
+            
+            // Award bonus points
+            addPoints('Complete routine bonus', 45);
+            
+            // Update streak
+            completeRoutineDay();
+            
+            // Reset for next time
+            setTimeout(() => {
+                resetRoutine();
+            }, 3000);
+        }
+        
+        function showRoutineComplete() {
+            const celebration = document.createElement('div');
+            celebration.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); z-index: 3000;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            celebration.innerHTML = `
+                <div style="background: linear-gradient(135deg, #FEF3C7, #FDE68A); padding: 40px; border-radius: 20px; text-align: center; max-width: 300px; animation: bounce 0.6s ease;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
+                    <h2 style="font-size: 20px; font-weight: 600; color: #92400E; margin-bottom: 8px;">Routine Complete!</h2>
+                    <p style="font-size: 14px; color: #B45309; margin-bottom: 16px;">Amazing work! Your skin will thank you.</p>
+                    <div style="font-size: 16px; font-weight: 600; color: #F59E0B;">+${totalRoutinePoints + 45} total points earned!</div>
+                </div>
+            `;
+            
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                celebration.remove();
+            }, 3000);
+        }
+        
+        function resetRoutine() {
+            completedSteps = [];
+            totalRoutinePoints = 0;
+            routineStartTime = null;
+            
+            // Reset UI
+            document.querySelectorAll('.routine-item').forEach(item => {
+                item.classList.remove('completed');
+                const checkbox = item.querySelector('.checkbox');
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+            });
+            
+            document.getElementById('completeAllBtn').style.display = 'none';
+            updateRoutineProgress();
+        }
+        
+        function loadUserProgress() {
+            // Load saved progress from localStorage
+            const savedProgress = localStorage.getItem('dailyProgress');
+            const today = new Date().toDateString();
+            
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                if (progress.date === today) {
+                    completedSteps = progress.steps || [];
+                    totalRoutinePoints = progress.points || 0;
+                    
+                    // Update UI
+                    completedSteps.forEach(stepName => {
+                        const stepElement = document.querySelector(`[data-step="${stepName}"]`);
+                        if (stepElement) {
+                            stepElement.classList.add('completed');
+                            const checkbox = stepElement.querySelector('.checkbox');
+                            checkbox.classList.add('checked');
+                            checkbox.textContent = '✓';
+                        }
+                    });
+                    
+                    updateRoutineProgress();
+                }
+            }
+            
+            // Check if challenge was completed today
+            const lastChallengeDate = localStorage.getItem('lastChallengeDate');
+            if (lastChallengeDate === today) {
+                const btn = document.getElementById('challengeBtn');
+                btn.textContent = '✓ Completed!';
+                btn.style.background = '#10B981';
+                btn.disabled = true;
+            }
+        }
+        
+        function saveUserProgress() {
+            const today = new Date().toDateString();
+            const progress = {
+                date: today,
+                steps: completedSteps,
+                points: totalRoutinePoints
+            };
+            localStorage.setItem('dailyProgress', JSON.stringify(progress));
+        }
+        
+        // Save progress when user completes steps
+        const originalAddPoints = addPoints;
+        addPoints = function(action, points) {
+            originalAddPoints(action, points);
+            saveUserProgress();
+        };
+        
+        // Mock API functions for dev mode
+        function mockApiCall(data) {
+            return new Promise(resolve => {
+                setTimeout(() => resolve({ success: true, ...data }), 100);
+            });
+        }
+        
+        // Override API calls in dev mode
+        const originalAddPoints = addPoints;
+        addPoints = function(action, points) {
+            if (authToken === 'dev-token') {
+                userPoints += points;
+                localStorage.setItem('dev-points', userPoints.toString());
+                updatePointsDisplay();
+                
+                // Show points earned notification
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #E8F5E8; color: #166534; padding: 12px 16px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease;';
+                notification.textContent = `+${points} points earned!`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+                return;
+            }
+            originalAddPoints(action, points);
+        };
         
         async function loadUserPoints() {
             try {
@@ -2102,7 +2606,7 @@
             const current = document.getElementById('currentPoints');
             const dashboard = document.getElementById('dashboardPoints');
             
-            if (badge) badge.textContent = `⭐ ${userPoints} points`;
+            if (badge) badge.textContent = `⭐ ${userPoints}`;
             if (current) current.textContent = `⭐ ${userPoints} points`;
             if (dashboard) dashboard.textContent = `${userPoints} points`;
             
@@ -2357,6 +2861,9 @@
                 loadUserPoints(),
                 loadUserStreak()
             ]);
+
+            // Initialize enhanced dashboard
+            initializeDashboard();
 
             // Award daily hydration check points (once per day)
             const lastHydrationCheck = localStorage.getItem('lastHydrationCheck');
