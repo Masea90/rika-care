@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIKA Care - Revenue Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #C4A484, #B8A082); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 32px; font-weight: 600; color: #C4A484; margin-bottom: 8px; }
+        .stat-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .revenue-chart { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .action-items { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .action-item { padding: 15px; border-left: 4px solid #C4A484; margin-bottom: 15px; background: #f9f9f9; }
+        .btn { background: #C4A484; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #B8A082; }
+        .refresh-btn { float: right; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 RIKA Care Revenue Dashboard</h1>
+            <p>Track your natural beauty app monetization in real-time</p>
+            <button class="btn refresh-btn" onclick="loadRevenue()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="mrr">$0</div>
+                <div class="stat-label">Monthly Recurring Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="affiliate-revenue">$0</div>
+                <div class="stat-label">Estimated Affiliate Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-users">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversion-rate">0%</div>
+                <div class="stat-label">Subscription Conversion Rate</div>
+            </div>
+        </div>
+
+        <div class="revenue-chart">
+            <h2>📊 Revenue Breakdown</h2>
+            <div id="revenue-breakdown">
+                <p>Loading revenue data...</p>
+            </div>
+        </div>
+
+        <div class="action-items">
+            <h2>🚀 Revenue Optimization Actions</h2>
+            <div class="action-item">
+                <strong>1. Sign up for Amazon Associates</strong><br>
+                <small>Earn 4-8% commission on beauty product sales. Takes 2-3 days for approval.</small><br>
+                <button class="btn" onclick="window.open('https://affiliate-program.amazon.com', '_blank')">Apply Now</button>
+            </div>
+            <div class="action-item">
+                <strong>2. Join iHerb Affiliate Program</strong><br>
+                <small>10% commission on natural/organic products. Instant approval.</small><br>
+                <button class="btn" onclick="window.open('https://www.iherb.com/info/affiliate-program', '_blank')">Join iHerb</button>
+            </div>
+            <div class="action-item">
+                <strong>3. Add Stripe Payment Processing</strong><br>
+                <small>Enable real subscription payments. 2.9% + 30¢ per transaction.</small><br>
+                <button class="btn" onclick="window.open('https://stripe.com', '_blank')">Setup Stripe</button>
+            </div>
+            <div class="action-item">
+                <strong>4. Contact Natural Beauty Brands</strong><br>
+                <small>Reach out for sponsored content opportunities ($100-500 per post).</small><br>
+                <button class="btn" onclick="showBrandContacts()">View Brand List</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadRevenue() {
+            try {
+                const response = await fetch('/api/admin/revenue');
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('mrr').textContent = '$' + (data.monthly_recurring_revenue || 0).toFixed(2);
+                document.getElementById('affiliate-revenue').textContent = '$' + (data.estimated_affiliate_revenue || 0).toFixed(2);
+                document.getElementById('total-users').textContent = data.total_users || 0;
+                
+                // Calculate conversion rate
+                const conversionRate = data.total_users > 0 ? 
+                    ((data.subscription_breakdown?.reduce((sum, tier) => sum + tier.count, 0) || 0) / data.total_users * 100) : 0;
+                document.getElementById('conversion-rate').textContent = conversionRate.toFixed(1) + '%';
+                
+                // Update breakdown
+                const breakdown = document.getElementById('revenue-breakdown');
+                if (data.subscription_breakdown && data.subscription_breakdown.length > 0) {
+                    breakdown.innerHTML = `
+                        <h3>Subscription Tiers:</h3>
+                        ${data.subscription_breakdown.map(tier => `
+                            <p><strong>${tier.tier}:</strong> ${tier.count} users × $${tier.price}/month = $${(tier.count * tier.price).toFixed(2)}/month</p>
+                        `).join('')}
+                        <hr style="margin: 15px 0;">
+                        <p><strong>Affiliate Clicks:</strong> ${data.affiliate_clicks} clicks from ${data.affiliate_users} users</p>
+                        <p><strong>Estimated Total Monthly Revenue:</strong> $${(data.monthly_recurring_revenue + data.estimated_affiliate_revenue).toFixed(2)}</p>
+                    `;
+                } else {
+                    breakdown.innerHTML = `
+                        <p>No subscription revenue yet. Focus on:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Getting users to complete their profiles</li>
+                            <li>Adding affiliate links to product recommendations</li>
+                            <li>Promoting premium features</li>
+                        </ul>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load revenue data:', error);
+                document.getElementById('revenue-breakdown').innerHTML = '<p style="color: red;">Failed to load revenue data. Make sure you\'re logged in as admin.</p>';
+            }
+        }
+
+        function showBrandContacts() {
+            const brands = [
+                'The Ordinary (Deciem) - hello@deciem.com',
+                'CeraVe - consumer.affairs@loreal.com',
+                'Neutrogena - consumer.care@jnj.com',
+                'Olaplex - info@olaplex.com',
+                'Drunk Elephant - hello@drunkelephant.com',
+                'Paula\'s Choice - customercare@paulaschoice.com',
+                'Glossier - gteam@glossier.com',
+                'Fenty Beauty - help@fentybeauty.com'
+            ];
+            
+            alert('Natural Beauty Brand Contacts:\\n\\n' + brands.join('\\n\\n') + '\\n\\nEmail template: "Hi! I run RIKA Care, a natural beauty app with [X] users. Would you be interested in sponsored product placements?"');
+        }
+
+        // Load data on page load
+        loadRevenue();
+        
+        // Auto-refresh every 5 minutes
+        setInterval(loadRevenue, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

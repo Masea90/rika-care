@@ -138,6 +138,11 @@ const authenticateToken = (req, res, next) => {
 
 // Routes
 
+// Serve revenue dashboard (admin only)
+app.get('/admin/revenue', (req, res) => {
+  res.sendFile(path.join(__dirname, 'revenue-dashboard.html'));
+});
+
 // Serve rika-care.html with no-cache headers to prevent stale content
 app.get('/rika-care.html', (req, res) => {
   // Set cache-control headers to prevent caching
@@ -387,7 +392,7 @@ app.post('/api/analysis/hair', authenticateToken, async (req, res) => {
   }
 });
 
-// Product Recommendations with Personalized Scoring
+// Product Recommendations with Affiliate Links
 app.get('/api/recommendations', authenticateToken, async (req, res) => {
   try {
     const user = await dbHelpers.findUserById(req.user.userId);
@@ -417,12 +422,17 @@ app.get('/api/recommendations', authenticateToken, async (req, res) => {
         cleanBeautyPreference: preferences.cleanBeauty !== false
       });
       
+      // Add affiliate tracking
+      const affiliateUrl = generateAffiliateUrl(product, req.user.userId);
+      
       return {
         ...product,
         matchScore: score.total,
         matchPercentage: Math.round(score.total),
         whyRecommended: generatePersonalizedReason(product, score.reasons),
-        scoreBreakdown: score.breakdown
+        scoreBreakdown: score.breakdown,
+        affiliateUrl: affiliateUrl,
+        earnCommission: true // Show users they help support the app
       };
     });
     
@@ -447,7 +457,8 @@ app.get('/api/recommendations', authenticateToken, async (req, res) => {
     res.json({ 
       products: recommendedProducts,
       totalProducts: allProducts.length,
-      filteredCount: filteredProducts.length
+      filteredCount: filteredProducts.length,
+      affiliateDisclosure: 'RIKA Care earns from qualifying purchases to keep the app free'
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -624,15 +635,53 @@ function getQualityScore(product) {
   return Math.min(10, score);
 }
 
-// Generate personalized recommendation reason
-function generatePersonalizedReason(product, reasons) {
-  if (reasons.length === 0) {
-    return 'Recommended based on your profile';
+// Generate affiliate URLs for revenue tracking
+function generateAffiliateUrl(product, userId) {
+  // Amazon affiliate link structure
+  if (product.affiliate_url && product.affiliate_url.includes('amazon')) {
+    const amazonTag = process.env.AMAZON_ASSOCIATE_TAG || 'rikacare-20';
+    return `${product.affiliate_url}&tag=${amazonTag}&linkCode=as2&camp=1789&creative=9325`;
   }
   
-  const mainReasons = reasons.slice(0, 2);
-  return `Great choice - ${mainReasons.join(' and ')}`;
+  // iHerb affiliate link
+  if (product.affiliate_url && product.affiliate_url.includes('iherb')) {
+    const iherbCode = process.env.IHERB_AFFILIATE_CODE || 'RIK1234';
+    return `${product.affiliate_url}?rcode=${iherbCode}`;
+  }
+  
+  // Default affiliate tracking
+  if (product.affiliate_url) {
+    return `${product.affiliate_url}?ref=rika&user=${userId}`;
+  }
+  
+  // Fallback to product page
+  return product.affiliate_url || '#';
 }
+
+// Track affiliate clicks for revenue analytics
+app.post('/api/affiliate/click', authenticateToken, async (req, res) => {
+  try {
+    const { productId, affiliateUrl } = req.body;
+    
+    // Log the click for analytics
+    console.log(`💰 Affiliate click: User ${req.user.userId} -> Product ${productId}`);
+    
+    // Track in user analytics
+    const user = await dbHelpers.findUserById(req.user.userId);
+    const analytics = user.analytics || {};
+    analytics.affiliateClicks = (analytics.affiliateClicks || 0) + 1;
+    analytics.lastAffiliateClick = new Date().toISOString();
+    
+    await dbHelpers.updateUser(req.user.userId, { analytics });
+    
+    // Award points for engagement
+    await dbHelpers.addPoints(req.user.userId, 'Product click', 2);
+    
+    res.json({ success: true, redirectUrl: affiliateUrl });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Generate detailed recommendation for product detail page
 function generateDetailedRecommendation(product, score, userProfile) {
@@ -1129,22 +1178,114 @@ app.get('/api/community/matches', authenticateToken, async (req, res) => {
   }
 });
 
-// Subscription Management
+// Premium Subscription Management
 app.post('/api/subscription/upgrade', authenticateToken, async (req, res) => {
   try {
     const { tier, paymentMethod } = req.body;
     
-    // Mock payment processing - integrate with Stripe/PayPal in production
+    // Pricing tiers
+    const pricing = {
+      PREMIUM: { price: 4.99, features: ['unlimited_scans', 'expert_chat', 'exclusive_products', 'ad_free'] },
+      PRO: { price: 9.99, features: ['personal_consultant', 'custom_routines', 'brand_partnerships', 'early_access'] }
+    };
+    
+    if (!pricing[tier]) {
+      return res.status(400).json({ error: 'Invalid subscription tier' });
+    }
+    
+    // Mock payment processing - integrate with Stripe in production
     const subscription = {
       tier,
+      price: pricing[tier].price,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      features: monetizationService.subscriptionTiers[tier].features,
-      paymentMethod
+      features: pricing[tier].features,
+      paymentMethod,
+      status: 'active',
+      startedAt: new Date().toISOString()
     };
 
     await dbHelpers.updateUser(req.user.userId, { subscription });
     
+    // Award bonus points for subscription
+    const bonusPoints = tier === 'PRO' ? 100 : 50;
+    await dbHelpers.addPoints(req.user.userId, `${tier} subscription bonus`, bonusPoints);
+    
+    console.log(`💰 New ${tier} subscriber: User ${req.user.userId} - $${pricing[tier].price}/month`);
+    
     res.json({ success: true, subscription });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Check subscription status
+app.get('/api/subscription/status', authenticateToken, async (req, res) => {
+  try {
+    const user = await dbHelpers.findUserById(req.user.userId);
+    const subscription = user.subscription || { tier: 'FREE', features: ['basic_recommendations', 'community_access'] };
+    
+    // Check if subscription expired
+    if (subscription.expiresAt && new Date(subscription.expiresAt) < new Date()) {
+      subscription.status = 'expired';
+      subscription.tier = 'FREE';
+    }
+    
+    res.json({ subscription });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Revenue analytics endpoint
+app.get('/api/admin/revenue', async (req, res) => {
+  try {
+    // This would be admin-only in production
+    const { db } = require('./database');
+    
+    // Get subscription revenue
+    const subscriptionStats = await new Promise((resolve) => {
+      db.all(`
+        SELECT 
+          JSON_EXTRACT(subscription, '$.tier') as tier,
+          COUNT(*) as count,
+          JSON_EXTRACT(subscription, '$.price') as price
+        FROM users 
+        WHERE JSON_EXTRACT(subscription, '$.tier') != 'FREE'
+        AND JSON_EXTRACT(subscription, '$.status') = 'active'
+        GROUP BY JSON_EXTRACT(subscription, '$.tier')
+      `, (err, rows) => {
+        if (err) resolve([]);
+        else resolve(rows);
+      });
+    });
+    
+    // Calculate monthly recurring revenue
+    let mrr = 0;
+    subscriptionStats.forEach(stat => {
+      mrr += (stat.price || 0) * (stat.count || 0);
+    });
+    
+    // Get affiliate click stats
+    const affiliateStats = await new Promise((resolve) => {
+      db.get(`
+        SELECT 
+          SUM(JSON_EXTRACT(analytics, '$.affiliateClicks')) as total_clicks,
+          COUNT(*) as active_users
+        FROM users 
+        WHERE JSON_EXTRACT(analytics, '$.affiliateClicks') > 0
+      `, (err, row) => {
+        if (err) resolve({ total_clicks: 0, active_users: 0 });
+        else resolve(row);
+      });
+    });
+    
+    res.json({
+      monthly_recurring_revenue: mrr,
+      subscription_breakdown: subscriptionStats,
+      affiliate_clicks: affiliateStats.total_clicks || 0,
+      affiliate_users: affiliateStats.active_users || 0,
+      estimated_affiliate_revenue: (affiliateStats.total_clicks || 0) * 0.05 // Assume $0.05 per click
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
