@@ -572,11 +572,7 @@
                 </select>
             </div>
             
-            <!-- Debug Test Button -->
-            <div style="margin-bottom: 16px; text-align: center;">
-                <button onclick="testJS()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Test JS</button>
-                <button onclick="testLoginForm()" style="background: #4ecdc4; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; margin-left: 8px;">Test Login</button>
-            </div>
+
             
             <div id="authError" class="error hidden"></div>
             
@@ -610,7 +606,7 @@
                     Sign in with Google
                 </button>
 
-                <button class="btn-ghost btn" onclick="console.log('Login button clicked'); showLoginForm();">Already have an account? Log in</button>
+                <button class="btn-ghost btn" onclick="showLoginForm(); return false;">Already have an account? Log in</button>
             </div>
 
             <!-- Log In Form -->
@@ -642,7 +638,7 @@
                     Sign in with Google
                 </button>
 
-                <button class="btn-ghost btn" onclick="console.log('Signup button clicked'); showSignupForm();">Need an account? Sign up</button>
+                <button class="btn-ghost btn" onclick="showSignupForm(); return false;">Need an account? Sign up</button>
             </div>
         </div>
 
