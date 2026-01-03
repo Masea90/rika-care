@@ -2419,11 +2419,9 @@
         }
         
         // Save progress when user completes steps
-        const originalAddPoints = addPoints;
-        addPoints = function(action, points) {
-            originalAddPoints(action, points);
+        function saveProgressWrapper() {
             saveUserProgress();
-        };
+        }
         
         // Test function to verify JavaScript is working
         function testJS() {
@@ -2438,8 +2436,7 @@
         };
         
         // Override API calls in dev mode
-        const originalAddPoints = addPoints;
-        addPoints = function(action, points) {
+        function addPoints(action, points) {
             if (authToken === 'dev-token') {
                 userPoints += points;
                 localStorage.setItem('dev-points', userPoints.toString());
@@ -2456,8 +2453,28 @@
                 }, 3000);
                 return;
             }
-            originalAddPoints(action, points);
-        };
+            
+            // Real API call for production
+            fetch(`${API_BASE}/points/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ action, points })
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            }).then(data => {
+                if (data) {
+                    userPoints = data.totalPoints;
+                    updatePointsDisplay();
+                }
+            }).catch(error => {
+                console.log('Could not add points');
+            });
+        }
         
         async function loadUserPoints() {
             try {
@@ -2638,7 +2655,7 @@
             }
         }
         
-        async function addPoints(action, points) {
+        async function addPointsAPI(action, points) {
             try {
                 const response = await fetch(`${API_BASE}/points/add`, {
                     method: 'POST',
