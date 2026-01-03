@@ -572,6 +572,12 @@
                 </select>
             </div>
             
+            <!-- Debug Test Button -->
+            <div style="margin-bottom: 16px; text-align: center;">
+                <button onclick="testJS()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Test JS</button>
+                <button onclick="testLoginForm()" style="background: #4ecdc4; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; margin-left: 8px;">Test Login</button>
+            </div>
+            
             <div id="authError" class="error hidden"></div>
             
             <!-- Sign Up Form -->
@@ -604,7 +610,7 @@
                     Sign in with Google
                 </button>
 
-                <button class="btn-ghost btn" onclick="showLoginForm()">Already have an account? Log in</button>
+                <button class="btn-ghost btn" onclick="console.log('Login button clicked'); showLoginForm();">Already have an account? Log in</button>
             </div>
 
             <!-- Log In Form -->
@@ -636,7 +642,7 @@
                     Sign in with Google
                 </button>
 
-                <button class="btn-ghost btn" onclick="showSignupForm()">Need an account? Sign up</button>
+                <button class="btn-ghost btn" onclick="console.log('Signup button clicked'); showSignupForm();">Need an account? Sign up</button>
             </div>
         </div>
 
@@ -2421,12 +2427,17 @@
             saveUserProgress();
         };
         
-        // Mock API functions for dev mode
-        function mockApiCall(data) {
-            return new Promise(resolve => {
-                setTimeout(() => resolve({ success: true, ...data }), 100);
-            });
+        // Test function to verify JavaScript is working
+        function testJS() {
+            console.log('JavaScript is working!');
+            alert('JavaScript is working!');
         }
+        
+        // Add test button functionality
+        window.testLoginForm = function() {
+            console.log('Test function called');
+            showLoginForm();
+        };
         
         // Override API calls in dev mode
         const originalAddPoints = addPoints;
@@ -3416,15 +3427,33 @@
 
         // Authentication Functions
         function showSignupForm() {
-            document.getElementById('signupForm').classList.remove('hidden');
-            document.getElementById('loginForm').classList.add('hidden');
-            clearAuthError();
+            console.log('showSignupForm called');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm && signupForm) {
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                clearAuthError();
+                console.log('Signup form shown successfully');
+            } else {
+                console.error('Login or signup form not found');
+            }
         }
         
         function showLoginForm() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('signupForm').classList.add('hidden');
-            clearAuthError();
+            console.log('showLoginForm called');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm && signupForm) {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                clearAuthError();
+                console.log('Login form shown successfully');
+            } else {
+                console.error('Login or signup form not found');
+            }
         }
         
         async function signup() {
@@ -3514,6 +3543,8 @@
 
         // Google OAuth Sign-In
         function signInWithGoogle() {
+            console.log('signInWithGoogle called');
+            console.log('Redirecting to:', API_BASE + '/auth/google');
             // Redirect to backend Google OAuth route
             window.location.href = API_BASE + '/auth/google';
         }
@@ -3569,6 +3600,43 @@
             }
         }
 
+        // Initialize button event listeners as backup
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up button listeners');
+            
+            // Add click listeners to buttons as backup
+            const loginButtons = document.querySelectorAll('button[onclick*="showLoginForm"]');
+            const signupButtons = document.querySelectorAll('button[onclick*="showSignupForm"]');
+            const googleButtons = document.querySelectorAll('button[onclick*="signInWithGoogle"]');
+            
+            loginButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    console.log('Login button clicked via event listener');
+                    showLoginForm();
+                });
+            });
+            
+            signupButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    console.log('Signup button clicked via event listener');
+                    showSignupForm();
+                });
+            });
+            
+            googleButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    console.log('Google button clicked via event listener');
+                    signInWithGoogle();
+                });
+            });
+            
+            console.log('Button listeners set up:', {
+                loginButtons: loginButtons.length,
+                signupButtons: signupButtons.length,
+                googleButtons: googleButtons.length
+            });
+        });
+        
         // Check for OAuth callback on page load
         window.addEventListener('DOMContentLoaded', () => {
             handleOAuthCallback();
